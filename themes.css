@@ -1,0 +1,621 @@
+/* ==========================================================================
+   SELECTOR DE ESTILOS
+   Sin data-theme = diseño clásico (style.css). Cada tema solo redefine tokens
+   y unos pocos extras; las reglas compartidas viven en `html[data-theme] body`.
+   ========================================================================== */
+
+/* ---------- Selector de estilos: botón flotante con menú desplegable ---------- */
+:root {
+    --bar-bg: rgba(255, 255, 255, 0.95);
+    --bar-border: 1px solid rgba(244, 63, 94, 0.2);
+    --bar-fg: #475569;
+    --bar-accent: #f43f5e;
+    --bar-accent-fg: #fff;
+    --bar-radius: 12px;
+    --bar-font: 'Outfit', sans-serif;
+}
+
+#theme-switcher {
+    position: fixed;
+    top: 10px; right: 12px;
+    z-index: 60;
+    font-family: var(--bar-font);
+}
+
+#theme-switcher .ts-toggle {
+    width: 36px; height: 36px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.05rem;
+    border-radius: 50%;
+    background: var(--bar-bg);
+    border: var(--bar-border);
+    opacity: 0.45;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+#theme-switcher .ts-toggle:hover,
+#theme-switcher .ts-toggle[aria-expanded="true"] { opacity: 1; transform: none; }
+
+#theme-switcher .ts-options {
+    position: absolute; top: 44px; right: 0;
+    display: flex; flex-direction: column; gap: 4px;
+    min-width: 170px; padding: 8px;
+    background: var(--bar-bg);
+    border: var(--bar-border);
+    border-radius: var(--bar-radius);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+#theme-switcher .ts-options[hidden] { display: none; }
+
+#theme-switcher .ts-options button {
+    width: 100%;
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: var(--bar-font);
+    border-radius: calc(var(--bar-radius) - 4px);
+    background: transparent;
+    color: var(--bar-fg);
+    border: 1px solid transparent;
+    box-shadow: none;
+    text-transform: none;
+    letter-spacing: 0;
+}
+#theme-switcher .ts-options button:hover { border-color: var(--bar-accent); transform: none; }
+#theme-switcher .ts-options button[aria-pressed="true"] {
+    background: var(--bar-accent);
+    color: var(--bar-accent-fg);
+    border-color: var(--bar-accent);
+}
+
+/* ==========================================================================
+   REGLAS COMPARTIDAS POR LOS TEMAS (todo lo que no sea el clásico)
+   ========================================================================== */
+html[data-theme] {
+    --heart-bg: #ffe4e6;
+    --heart-fill: linear-gradient(135deg, #ff7eb3, #f43f5e);
+}
+
+html[data-theme] body {
+    background: var(--page-bg) !important;
+    background-attachment: fixed !important;
+    color: var(--text-color);
+
+    * { font-family: var(--font-body); }
+    :is(h1, h2, h3, .slow-word, .cinematic-word, .header-title, .logo-text, .shield, .btn-marriage, .btn-proposal) {
+        font-family: var(--font-head);
+    }
+    .polaroid-caption { font-family: var(--font-hand, 'Caveat'), cursive; }
+
+    .blob { display: none; }
+
+    .app-header, .app-footer {
+        background: var(--chrome-bg);
+        border-color: var(--chrome-border-color);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+    .app-footer, .app-footer p { color: var(--chrome-fg); margin-bottom: 0; }
+    .header-title { color: var(--chrome-fg); letter-spacing: var(--head-spacing, 0.5px); }
+    .header-logo, .logo-text { color: var(--primary); }
+
+    .glass-panel {
+        background: var(--glass-bg);
+        border: var(--panel-border);
+        border-radius: var(--radius);
+        box-shadow: var(--panel-shadow);
+        backdrop-filter: var(--panel-blur, none);
+        -webkit-backdrop-filter: var(--panel-blur, none);
+        color: var(--text-color);
+    }
+    .proposal-panel, .celebration-panel {
+        background: var(--glass-bg);
+        border: var(--panel-border);
+        box-shadow: var(--panel-shadow);
+    }
+
+    :is(h1, .proposal-text, .celebration-title, .slow-word.word-3) {
+        background: var(--h1-bg) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: var(--h1-fill) !important;
+        -webkit-text-stroke: var(--h1-stroke, 0px transparent);
+        paint-order: stroke fill;
+        text-shadow: none;
+        letter-spacing: var(--head-spacing, 0);
+        filter: var(--h1-filter, none);
+    }
+    h2 { color: var(--heading); letter-spacing: var(--head-spacing, 0); }
+    h3 { color: var(--primary); }
+    p { color: var(--text-muted); }
+    .celebration-text p { color: var(--text-color) !important; }
+    .celebration-subtitle { color: var(--text-muted); }
+    #animation-percentage { color: var(--primary); }
+
+    .slow-word, .cinematic-word {
+        color: var(--accent-text);
+        text-shadow: var(--word-shadow, none);
+        -webkit-text-stroke: var(--word-stroke, 0px transparent);
+        paint-order: stroke fill;
+    }
+
+    /* Botones */
+    button {
+        border-radius: var(--btn-radius);
+        text-transform: var(--btn-transform, none);
+        letter-spacing: var(--btn-spacing, 0);
+        font-weight: var(--btn-weight, 600);
+    }
+    .btn-primary, .btn-proposal, .btn-marriage.btn-yes {
+        background: var(--btn-bg);
+        color: var(--btn-fg);
+        border: var(--btn-border);
+        box-shadow: var(--btn-shadow);
+        animation: none;
+    }
+    .btn-primary:hover, .btn-proposal:hover, .btn-marriage.btn-yes:hover {
+        background: var(--btn-bg);
+        filter: brightness(1.08);
+        transform: var(--btn-hover-transform, translateY(-2px));
+        box-shadow: var(--btn-shadow-hover, var(--btn-shadow));
+    }
+    .btn-secondary, .option-btn, .btn-marriage.btn-no {
+        background: var(--opt-bg);
+        color: var(--text-color);
+        border: var(--opt-border);
+        box-shadow: var(--opt-shadow, none);
+    }
+    .btn-secondary:hover, .option-btn:hover:not(:disabled) {
+        background: var(--opt-hover-bg);
+        color: var(--text-color);
+        border-color: var(--primary);
+        transform: var(--opt-hover-transform, translateX(4px));
+        box-shadow: var(--opt-shadow-hover, var(--opt-shadow, none));
+    }
+    .option-btn.correct {
+        background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok-fg);
+    }
+    .option-btn.incorrect {
+        background: var(--ko-bg); border-color: var(--ko-border); color: var(--ko-fg);
+    }
+
+    .progress-bar-container { background: var(--track-bg); border: var(--track-border, 0); border-radius: var(--btn-radius); }
+    .progress-bar { background: var(--bar-fill); border-radius: var(--btn-radius); }
+    .test-header { color: var(--text-muted); }
+
+    .shield {
+        background: var(--shield-bg);
+        color: var(--shield-fg);
+        border: var(--shield-border, 0);
+        box-shadow: var(--shield-shadow, none);
+        border-radius: var(--shield-radius, 16px);
+    }
+    .question-image, .skeleton-image { border-radius: var(--radius); border: var(--img-border, 1px solid var(--glass-border)); box-shadow: var(--img-shadow, none); }
+
+    .tesla-banner-content { background: var(--opt-bg); border: 1px dashed var(--primary); border-radius: var(--radius); }
+    .tesla-banner-divider { background: linear-gradient(to right, transparent, var(--primary), transparent); opacity: 0.5; }
+    .banner-desc { color: var(--text-muted); }
+
+    .polaroid-frame { background: var(--polaroid-bg, #fff); border: var(--polaroid-border, 1px solid rgba(0,0,0,.06)); box-shadow: var(--polaroid-shadow, 0 15px 35px rgba(0,0,0,.25)); }
+    .polaroid-caption { color: var(--polaroid-fg, #475569); }
+    .pulsing-heart-svg { fill: var(--primary); }
+}
+
+html[data-theme] #btn-tesla-start.btn-primary {
+    background: var(--btn-bg);
+    box-shadow: var(--btn-shadow);
+    color: var(--btn-fg);
+}
+html[data-theme] #animation-screen div[style*="clip-path"] { background: var(--heart-bg) !important; }
+html[data-theme] #heart-fill-element { background: var(--heart-fill) !important; }
+html[data-theme] #animation-screen div[style*="drop-shadow"] { filter: var(--heart-glow, none) !important; }
+
+/* ==========================================================================
+   TEMA 1 — CARTOON · "Autoescuela Amor"
+   Contornos gruesos, sombras duras, colores planos, nubes y carretera.
+   ========================================================================== */
+html[data-theme="toon"] {
+    --ink: #1b1b2f;
+    --page-bg:
+        radial-gradient(circle at 2px 2px, rgba(255,255,255,.38) 2px, transparent 2.5px) 0 0 / 20px 20px,
+        linear-gradient(#5ec4ff 0%, #a9e6ff 65%, #fff3b8 100%);
+    --text-color: var(--ink);
+    --text-muted: #4b4b66;
+    --heading: var(--ink);
+    --primary: #ff4d8d;
+    --glass-bg: #ffffff;
+    --glass-border: var(--ink);
+    --panel-border: 4px solid var(--ink);
+    --panel-shadow: 8px 8px 0 var(--ink);
+    --radius: 24px;
+    --font-body: 'Fredoka', sans-serif;
+    --font-head: 'Bangers', 'Fredoka', cursive;
+    --font-hand: 'Fredoka';
+    --head-spacing: 1.5px;
+    --h1-bg: none;
+    --h1-fill: #ff4d8d;
+    --h1-stroke: 2.5px var(--ink);
+    --h1-filter: drop-shadow(4px 4px 0 var(--ink));
+    --accent-text: #ff4d8d;
+    --word-shadow: 5px 5px 0 var(--ink);
+    --word-stroke: 3px var(--ink);
+    --chrome-bg: #ffd23f;
+    --chrome-border-color: var(--ink);
+    --chrome-fg: var(--ink);
+
+    --btn-radius: 16px;
+    --btn-bg: #ffd23f;
+    --btn-fg: var(--ink);
+    --btn-border: 3px solid var(--ink);
+    --btn-shadow: 0 6px 0 var(--ink);
+    --btn-shadow-hover: 0 8px 0 var(--ink);
+    --btn-hover-transform: translateY(-2px) rotate(-1deg);
+    --btn-weight: 700;
+    --opt-bg: #fff;
+    --opt-hover-bg: #fff4c2;
+    --opt-border: 3px solid var(--ink);
+    --opt-shadow: 0 4px 0 var(--ink);
+    --opt-hover-transform: translate(2px, -2px);
+    --opt-shadow-hover: 0 6px 0 var(--ink);
+    --ok-bg: #7bed9f; --ok-border: var(--ink); --ok-fg: var(--ink);
+    --ko-bg: #ff7b7b; --ko-border: var(--ink); --ko-fg: var(--ink);
+    --track-bg: #fff;
+    --track-border: 3px solid var(--ink);
+    --bar-fill: repeating-linear-gradient(45deg, #ff4d8d 0 12px, #ff86b3 12px 24px);
+    --shield-bg: #ff4d8d;
+    --shield-fg: #fff;
+    --shield-border: 4px solid var(--ink);
+    --shield-shadow: 5px 5px 0 var(--ink);
+    --shield-radius: 50%;
+    --img-border: 3px solid var(--ink);
+    --img-shadow: 4px 4px 0 var(--ink);
+    --polaroid-border: 3px solid var(--ink);
+    --polaroid-shadow: 6px 6px 0 var(--ink);
+    --polaroid-fg: var(--ink);
+    --heart-bg: #fff;
+    --heart-fill: linear-gradient(#ff86b3, #ff4d8d);
+    --heart-glow: drop-shadow(4px 4px 0 #1b1b2f);
+
+    --bar-bg: #fff;
+    --bar-border: 3px solid var(--ink);
+    --bar-fg: var(--ink);
+    --bar-accent: #ff4d8d;
+    --bar-font: 'Fredoka', sans-serif;
+}
+
+html[data-theme="toon"] body {
+    #theme-switcher .ts-toggle { opacity: 1; box-shadow: 2px 2px 0 var(--ink); }
+    #theme-switcher .ts-options { box-shadow: 4px 4px 0 var(--ink); }
+    #theme-switcher .ts-options button[aria-pressed="true"] { border-color: var(--ink); }
+    .logo-heart { filter: drop-shadow(2px 2px 0 var(--ink)); }
+    .header-title { font-size: 1.4rem; }
+    .shield { font-family: 'Bangers'; font-size: 1.9rem; letter-spacing: 2px; text-shadow: 2px 2px 0 var(--ink); animation: toonWobble 2.5s ease-in-out infinite; }
+    .btn-primary, .btn-proposal, .btn-marriage.btn-yes { font-size: 1.15rem; }
+    .btn-proposal, .btn-marriage.btn-yes { background: #ff4d8d; color: #fff; text-shadow: 2px 2px 0 var(--ink); }
+    button:active:not(:disabled) { transform: translateY(5px) !important; box-shadow: 0 1px 0 var(--ink) !important; }
+    .screen.active .glass-panel { animation: toonPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+    .polaroid-frame.animate-polaroid { animation: polaroidEntrance 1.5s cubic-bezier(0.25, 1, 0.5, 1) 0.8s forwards; }
+    .test-panel h2 { font-family: 'Fredoka'; font-weight: 700; }
+
+    /* El footer es una carretera con un cochecito */
+    .app-footer {
+        position: relative; overflow: hidden;
+        background: #3d3d4e; --chrome-fg: #fff;
+        border-top: 5px solid var(--ink);
+        padding-top: 26px;
+    }
+    .app-footer::before {
+        content: ''; position: absolute; left: 0; right: 0; top: 11px; height: 4px;
+        background: repeating-linear-gradient(90deg, #ffd23f 0 34px, transparent 34px 68px);
+    }
+    .app-footer::after {
+        content: '🚗💨'; position: absolute; top: -4px; font-size: 1.7rem; left: 110%;
+        animation: toonDrive 9s linear infinite; filter: drop-shadow(2px 2px 0 var(--ink));
+    }
+}
+
+/* Nubes y sol de fondo */
+html[data-theme="toon"] #background-elements::before {
+    content: '☁️'; position: absolute; top: 14%; left: -15%; font-size: 150px; opacity: 0.95;
+    filter: drop-shadow(5px 5px 0 rgba(27,27,47,.25));
+    animation: toonCloud 38s linear infinite;
+}
+html[data-theme="toon"] #background-elements::after {
+    content: '☀️'; position: absolute; top: 5%; right: 6%; font-size: 90px;
+    animation: toonSun 12s linear infinite;
+}
+
+@keyframes toonPop { 0% { transform: scale(0.85) rotate(-1.5deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+@keyframes toonWobble { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg) scale(1.05); } }
+@keyframes toonDrive { from { left: 110%; } to { left: -15%; } }
+@keyframes toonCloud { from { left: -20%; } to { left: 110%; } }
+@keyframes toonSun { to { transform: rotate(360deg); } }
+
+/* ==========================================================================
+   TEMA 2 — SYNTHWAVE · "Outrun 1985"
+   Sol retro, rejilla en perspectiva y neón: conducir hacia el atardecer.
+   ========================================================================== */
+html[data-theme="synthwave"] {
+    --page-bg: linear-gradient(180deg, #0d0221 0%, #2a0a5e 40%, #7a1a8f 60%, #ff2e93 75%, #ff7a3d 100%);
+    --text-color: #f4eaff;
+    --text-muted: #b9a6e6;
+    --heading: #fff;
+    --primary: #ff2e93;
+    --glass-bg: rgba(16, 4, 40, 0.8);
+    --glass-border: rgba(0, 240, 255, 0.5);
+    --panel-border: 2px solid #00f0ff;
+    --panel-shadow: 0 0 22px rgba(0, 240, 255, 0.45), inset 0 0 28px rgba(185, 103, 255, 0.2);
+    --panel-blur: blur(8px);
+    --radius: 6px;
+    --font-body: 'Chakra Petch', sans-serif;
+    --font-head: 'Orbitron', sans-serif;
+    --font-hand: 'Chakra Petch';
+    --head-spacing: 1.5px;
+    --h1-bg: linear-gradient(90deg, #00f0ff, #ff2e93);
+    --h1-fill: transparent;
+    --h1-filter: drop-shadow(0 0 10px rgba(255, 46, 147, 0.6));
+    --accent-text: #fff;
+    --word-shadow: 0 0 12px #ff2e93, 0 0 30px #ff2e93, 0 0 60px #b967ff;
+    --chrome-bg: rgba(13, 2, 33, 0.85);
+    --chrome-border-color: rgba(0, 240, 255, 0.5);
+    --chrome-fg: #00f0ff;
+
+    --btn-radius: 4px;
+    --btn-bg: linear-gradient(90deg, #ff2e93, #ff7a3d);
+    --btn-fg: #fff;
+    --btn-border: 1px solid rgba(255, 255, 255, 0.4);
+    --btn-shadow: 0 0 18px rgba(255, 46, 147, 0.7);
+    --btn-shadow-hover: 0 0 30px rgba(255, 46, 147, 1);
+    --btn-transform: uppercase;
+    --btn-spacing: 1.5px;
+    --btn-weight: 700;
+    --opt-bg: rgba(255, 255, 255, 0.05);
+    --opt-hover-bg: rgba(0, 240, 255, 0.1);
+    --opt-border: 1px solid rgba(0, 240, 255, 0.5);
+    --opt-shadow-hover: 0 0 16px rgba(0, 240, 255, 0.5);
+    --ok-bg: rgba(0, 255, 163, 0.15); --ok-border: #00ffa3; --ok-fg: #b5ffe2;
+    --ko-bg: rgba(255, 46, 100, 0.2); --ko-border: #ff2e64; --ko-fg: #ffc2d2;
+    --track-bg: rgba(255, 255, 255, 0.1);
+    --track-border: 1px solid rgba(0, 240, 255, 0.4);
+    --bar-fill: linear-gradient(90deg, #00f0ff, #ff2e93);
+    --shield-bg: linear-gradient(135deg, #ff2e93, #b967ff);
+    --shield-fg: #fff;
+    --shield-border: 2px solid #00f0ff;
+    --shield-shadow: 0 0 22px rgba(0, 240, 255, 0.7);
+    --shield-radius: 8px;
+    --img-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+    --polaroid-bg: #1a0638;
+    --polaroid-border: 1px solid #00f0ff;
+    --polaroid-shadow: 0 0 28px rgba(255, 46, 147, 0.6);
+    --polaroid-fg: #00f0ff;
+    --heart-bg: rgba(255, 255, 255, 0.12);
+    --heart-fill: linear-gradient(135deg, #00f0ff, #ff2e93);
+    --heart-glow: drop-shadow(0 0 16px rgba(255, 46, 147, 0.9));
+
+    --bar-bg: rgba(13, 2, 33, 0.9);
+    --bar-border: 1px solid rgba(0, 240, 255, 0.5);
+    --bar-fg: #cfe;
+    --bar-accent: #ff2e93;
+    --bar-radius: 4px;
+    --bar-font: 'Chakra Petch', sans-serif;
+}
+
+html[data-theme="synthwave"] body {
+    .shield { font-family: 'Orbitron'; font-size: 1.3rem; }
+    .header-title { font-size: 0.95rem; text-transform: uppercase; text-shadow: 0 0 10px rgba(0, 240, 255, 0.8); }
+    .logo-text { text-shadow: 0 0 10px #ff2e93; }
+    .app-footer { text-shadow: 0 0 8px rgba(0, 240, 255, 0.6); }
+    .btn-proposal, .btn-marriage.btn-yes { animation: neonPulse 1.6s ease-in-out infinite alternate; }
+    .slow-word.word-3 { filter: drop-shadow(0 0 14px rgba(255, 46, 147, 0.8)); }
+    .celebration-text p { text-shadow: 0 0 6px rgba(0, 0, 0, 0.8); }
+}
+
+/* Sol rayado + suelo de rejilla en perspectiva */
+html[data-theme="synthwave"] #background-elements::before {
+    content: ''; position: absolute; left: 50%; bottom: 36%; width: min(340px, 60vw); aspect-ratio: 1;
+    transform: translateX(-50%); border-radius: 50%;
+    background: linear-gradient(180deg, #ffe66d 10%, #ff7a3d 45%, #ff2e93 90%);
+    -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 16px, transparent 16px 21px);
+    mask-image: repeating-linear-gradient(180deg, #000 0 16px, transparent 16px 21px);
+    -webkit-mask-size: 100% 100%;
+    filter: drop-shadow(0 0 40px rgba(255, 46, 147, 0.8));
+}
+html[data-theme="synthwave"] #background-elements::after {
+    content: ''; position: absolute; left: -50%; right: -50%; bottom: 0; height: 38%;
+    background:
+        linear-gradient(rgba(0, 240, 255, 0.7) 2px, transparent 2px) 0 0 / 64px 64px,
+        linear-gradient(90deg, rgba(0, 240, 255, 0.7) 2px, transparent 2px) 0 0 / 64px 64px,
+        #14012e;
+    box-shadow: 0 -6px 40px #ff2e93;
+    transform: perspective(300px) rotateX(58deg); transform-origin: 50% 100%;
+    animation: gridRun 1.6s linear infinite;
+}
+@keyframes gridRun { to { background-position: 0 64px, 64px 0, 0 0; } }
+@keyframes neonPulse { from { box-shadow: 0 0 14px rgba(255, 46, 147, 0.6); } to { box-shadow: 0 0 34px rgba(255, 46, 147, 1); } }
+
+/* ==========================================================================
+   TEMA 3 — W NOIR · "Edición Privada"
+   Negro y oro, serif elegante: el aperitivo de la cena en el hotel W.
+   ========================================================================== */
+html[data-theme="noir"] {
+    --page-bg:
+        radial-gradient(ellipse at 50% -10%, #3a2e17 0%, rgba(11, 11, 13, 0) 60%),
+        radial-gradient(ellipse at 50% 110%, #2a1a12 0%, rgba(11, 11, 13, 0) 55%),
+        #0b0b0d;
+    --text-color: #ece4d0;
+    --text-muted: #a89f8a;
+    --heading: #f5e6b3;
+    --primary: #d4af37;
+    --glass-bg: rgba(255, 255, 255, 0.035);
+    --glass-border: rgba(212, 175, 55, 0.4);
+    --panel-border: 1px solid rgba(212, 175, 55, 0.5);
+    --panel-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 6px #0b0b0d, inset 0 0 0 7px rgba(212, 175, 55, 0.25);
+    --panel-blur: blur(6px);
+    --radius: 3px;
+    --font-body: 'Jost', sans-serif;
+    --font-head: 'Playfair Display', serif;
+    --font-hand: 'Playfair Display';
+    --h1-bg: linear-gradient(100deg, #f5e6b3 0%, #d4af37 50%, #b8860b 100%);
+    --h1-fill: transparent;
+    --accent-text: #f5e6b3;
+    --word-shadow: 0 0 30px rgba(212, 175, 55, 0.45);
+    --chrome-bg: rgba(11, 11, 13, 0.9);
+    --chrome-border-color: rgba(212, 175, 55, 0.35);
+    --chrome-fg: #d4af37;
+
+    --btn-radius: 2px;
+    --btn-bg: linear-gradient(135deg, #f5e6b3, #d4af37 55%, #a67c1a);
+    --btn-fg: #17120a;
+    --btn-border: 1px solid #f5e6b3;
+    --btn-shadow: 0 8px 24px rgba(212, 175, 55, 0.25);
+    --btn-shadow-hover: 0 10px 32px rgba(212, 175, 55, 0.5);
+    --btn-transform: uppercase;
+    --btn-spacing: 0.14em;
+    --btn-weight: 500;
+    --opt-bg: transparent;
+    --opt-hover-bg: rgba(212, 175, 55, 0.1);
+    --opt-border: 1px solid rgba(212, 175, 55, 0.35);
+    --ok-bg: rgba(120, 190, 140, 0.15); --ok-border: #78be8c; --ok-fg: #cdeed6;
+    --ko-bg: rgba(190, 80, 80, 0.15); --ko-border: #be5050; --ko-fg: #f0c5c5;
+    --track-bg: rgba(255, 255, 255, 0.08);
+    --bar-fill: linear-gradient(90deg, #a67c1a, #f5e6b3);
+    --shield-bg: transparent;
+    --shield-fg: #d4af37;
+    --shield-border: 1px solid #d4af37;
+    --shield-shadow: 0 0 0 5px #0b0b0d, 0 0 0 6px rgba(212, 175, 55, 0.5);
+    --shield-radius: 50%;
+    --polaroid-bg: #f4eee0;
+    --polaroid-border: 1px solid #d4af37;
+    --polaroid-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    --polaroid-fg: #3a2e17;
+    --heart-bg: rgba(255, 255, 255, 0.08);
+    --heart-fill: linear-gradient(135deg, #f5e6b3, #d4af37);
+    --heart-glow: drop-shadow(0 0 18px rgba(212, 175, 55, 0.5));
+
+    --bar-bg: rgba(11, 11, 13, 0.92);
+    --bar-border: 1px solid rgba(212, 175, 55, 0.35);
+    --bar-fg: #d9cfae;
+    --bar-accent: #d4af37;
+    --bar-accent-fg: #17120a;
+    --bar-radius: 2px;
+    --bar-font: 'Jost', sans-serif;
+}
+
+html[data-theme="noir"] body {
+    h1, h2, .slow-word, .cinematic-word, .proposal-text, .celebration-title { font-style: italic; font-weight: 500; }
+    .shield { font-family: 'Playfair Display'; font-style: italic; font-size: 1.5rem; }
+    .header-title { font-size: 0.9rem; font-weight: 400; text-transform: uppercase; letter-spacing: 0.3em; font-family: 'Jost'; }
+    .app-footer { letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.7rem; }
+    .polaroid-caption { font-style: italic; font-size: 1.3rem; }
+    .option-btn { font-weight: 300; font-size: 1.05rem; }
+    .option-btn.correct, .option-btn.incorrect { font-weight: 500; }
+}
+
+/* Polvo de oro flotando */
+html[data-theme="noir"] #background-elements::before {
+    content: ''; position: absolute; inset: -50% 0 0 0;
+    background:
+        radial-gradient(circle, rgba(245, 230, 179, 0.9) 0 1px, transparent 1.5px) 0 0 / 130px 130px,
+        radial-gradient(circle, rgba(212, 175, 55, 0.7) 0 1.5px, transparent 2px) 45px 70px / 210px 210px,
+        radial-gradient(circle, rgba(245, 230, 179, 0.5) 0 1px, transparent 1.5px) 90px 20px / 90px 90px;
+    animation: goldDust 40s linear infinite;
+}
+html[data-theme="noir"] #background-elements::after {
+    content: 'W'; position: absolute; right: -2%; bottom: -12%;
+    font: italic 500 min(60vw, 520px)/1 'Playfair Display', serif;
+    color: rgba(212, 175, 55, 0.045);
+    pointer-events: none;
+}
+@keyframes goldDust { to { transform: translateY(50%); } }
+
+/* Decorado animado del fondo cartoon (el DOM lo crea themes.js) */
+.toon-deco { display: none; position: absolute; line-height: 1; pointer-events: none; user-select: none; }
+html[data-theme="toon"] .toon-deco { display: block; }
+html[data-theme="toon"] .toon-ground {
+    left: -5%; right: -5%; bottom: 40px; height: 38px;
+    background: linear-gradient(#7bed9f, #4cc77a);
+    border-top: 4px solid #1b1b2f;
+    border-radius: 60% 60% 0 0 / 100% 100% 0 0;
+}
+html[data-theme="toon"] .toon-still { filter: drop-shadow(3px 3px 0 rgba(27, 27, 47, 0.35)); }
+html[data-theme="toon"] .toon-plane { transform: rotate(45deg); }
+html[data-theme="toon"] .toon-right,
+html[data-theme="toon"] .toon-left { left: -15%; animation: toonFly linear infinite; }
+html[data-theme="toon"] .toon-left { animation-name: toonFlyBack; }
+html[data-theme="toon"] .toon-right-car,
+html[data-theme="toon"] .toon-left-car { left: -15%; animation: toonFly linear infinite; filter: drop-shadow(2px 2px 0 rgba(27, 27, 47, 0.4)); }
+html[data-theme="toon"] .toon-right-car { transform: scaleX(-1); animation-name: toonDriveRight; }
+html[data-theme="toon"] .toon-left-car { animation-name: toonFlyBack; }
+html[data-theme="toon"] .toon-bob { animation: toonBob ease-in-out infinite alternate; }
+html[data-theme="toon"] .toon-up { animation: toonUp ease-in infinite; opacity: 0; }
+
+@keyframes toonFly { from { left: -15%; } to { left: 110%; } }
+@keyframes toonFlyBack { from { left: 110%; } to { left: -15%; } }
+@keyframes toonDriveRight { from { left: -15%; transform: scaleX(-1); } to { left: 110%; transform: scaleX(-1); } }
+@keyframes toonBob { from { transform: translateY(0) rotate(-6deg); } to { transform: translateY(-22px) rotate(6deg); } }
+@keyframes toonUp { 0% { transform: translateY(0) scale(0.6); opacity: 0; } 15% { opacity: 0.9; } 100% { transform: translateY(-55vh) scale(1.2); opacity: 0; } }
+
+/* Cartoon compacto: que la pantalla de inicio quepa sin scroll en portátiles */
+@media (min-width: 769px) {
+    html[data-theme="toon"] body {
+        .glass-panel { padding: clamp(18px, 3.2vh, 34px) 30px; }
+        .logo-container { margin-bottom: 8px; }
+        .shield { width: 64px; height: 64px; font-size: 1.6rem; }
+        h1 { margin-bottom: 4px; }
+        p { margin-bottom: clamp(10px, 2vh, 20px); }
+        .button-group { gap: clamp(8px, 1.4vh, 14px); }
+        .button-group button { padding: clamp(9px, 1.5vh, 14px) 20px; }
+        .tesla-banner { margin-top: 12px; padding-top: 0; gap: 10px; }
+        .tesla-banner-content { padding: 8px 14px; }
+        .btn-tesla-action { padding: 9px 12px; }
+        .app-header { padding: 10px 20px; }
+        .app-footer { padding-bottom: 8px; }
+        #main-content { padding: 14px 20px; }
+        .test-header { margin-bottom: 12px; }
+        h2 { margin-bottom: clamp(10px, 2vh, 20px); }
+        .options-container { gap: clamp(8px, 1.4vh, 12px); }
+        .option-btn { padding: clamp(10px, 1.8vh, 16px) 18px; }
+        .question-image { max-height: clamp(120px, 22vh, 200px); }
+        /* Celebración final */
+        .pulsing-heart-svg { width: 56px; height: 56px; }
+        .heart-pulse-container { margin-bottom: 6px; }
+        .celebration-title { font-size: 1.9rem; margin-bottom: 0; }
+        .celebration-subtitle { margin-bottom: 12px; font-size: 1.05rem; }
+        .polaroid-frame { margin-bottom: 14px; padding: 10px 10px 14px; }
+        .polaroid-frame img { height: clamp(110px, 19vh, 240px); }
+        .polaroid-caption { margin-top: 8px; font-size: 1.3rem; }
+        .celebration-text p { font-size: 1rem; line-height: 1.4; margin-bottom: 0; }
+        #btn-glovebox, #btn-celebration-restart { margin-top: 12px !important; padding: 10px 20px; }
+    }
+}
+
+/* Botón de sonido (junto al selector de estilos) */
+.sfx-toggle {
+    position: fixed; top: 10px; right: 56px; z-index: 60;
+    width: 36px; height: 36px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.05rem; border-radius: 50%;
+    background: var(--bar-bg); border: var(--bar-border);
+    opacity: 0.45; transition: opacity 0.2s ease;
+}
+.sfx-toggle:hover { opacity: 1; transform: none; }
+html[data-theme="toon"] .sfx-toggle { opacity: 1; box-shadow: 2px 2px 0 var(--ink); }
+
+/* Cartoon estilo videojuego: cursor-coche (lo mueve themes.js) */
+#toon-cursor { display: none; }
+html[data-theme="toon"] body.toon-cursor-on,
+html[data-theme="toon"] body.toon-cursor-on * { cursor: none !important; }
+html[data-theme="toon"] body.toon-cursor-on #toon-cursor {
+    display: block; position: fixed; left: 0; top: 0; z-index: 9999;
+    font-size: 34px; line-height: 1; pointer-events: none; user-select: none;
+    margin: -17px 0 0 -17px;
+    filter: drop-shadow(2px 3px 0 rgba(27, 27, 47, 0.45));
+    will-change: transform;
+}
+#toon-cursor .tc-car { display: block; transition: transform 0.12s ease-out; }
+#toon-cursor.down .tc-car { transform: scale(0.8) !important; }
+.toon-puff {
+    position: fixed; z-index: 9998; pointer-events: none; font-size: 14px; line-height: 1;
+    animation: toonPuff 0.5s ease-out forwards;
+}
+@keyframes toonPuff { from { opacity: 0.8; transform: translate(-50%, -50%) scale(0.6); } to { opacity: 0; transform: translate(-50%, -80%) scale(1.6); } }

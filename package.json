@@ -1,0 +1,9 @@
+{
+  "name": "autoescuela-cari",
+  "private": true,
+  "type": "module",
+  "description": "Examen de conducir del amor (web estática + login en Vercel)",
+  "dependencies": {
+    "@vercel/functions": "^2.0.0"
+  }
+}

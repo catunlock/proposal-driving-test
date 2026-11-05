@@ -1,0 +1,291 @@
+[
+    {
+        "text": "La señal circular con borde rojo e interior blanco indica:",
+        "image": "assets/prohibicion_paso_1776806658186.webp",
+        "options": [
+            "Prohibición de paso.",
+            "Circulación prohibida a toda clase de vehículos en ambos sentidos.",
+            "Peligro por estrechamiento de la calzada."
+        ],
+        "correctIndex": 1,
+        "isPersonal": false,
+        "place": "autoescuela"
+    },
+    {
+        "text": "Si se encuentra una señal de STOP y no hay línea de detención, ¿dónde debe detenerse?",
+        "image": "assets/senal_stop_1776806673827.webp",
+        "options": [
+            "Inmediatamente antes de la intersección.",
+            "A la altura de la señal de STOP.",
+            "No es obligatorio detenerse si no viene nadie."
+        ],
+        "correctIndex": 0,
+        "isPersonal": false,
+        "place": "autoescuela"
+    },
+    {
+        "text": "Que significa la siguiente señal?",
+        "image": "assets/Gemini_Generated_Image_n0vyr6n0vyr6n0vy.webp",
+        "options": [
+            "Prohibido el paso a personas que no vayan cogidas de la mano",
+            "Prohibida la circulacion de parejas por la calzada.",
+            "Obligacion de circular en fila por el arcen"
+        ],
+        "correctIndex": 1,
+        "isPersonal": false,
+        "place": "cafeteria"
+    },
+    {
+        "text": "Que significa esta señal?",
+        "image": "assets/prioridad_absoluta_para_el_amor_de_mi_vida.webp",
+        "options": [
+            "Prioridad absoluta para el amor de mi vida.",
+            "La bolsa del amor esta al alza.",
+            "Los corazones estan subiendo"
+        ],
+        "correctIndex": -1,
+        "isPersonal": true,
+        "place": "cafeteria"
+    },
+    {
+        "text": "Al abandonar el estacionamiento nocturno (salir de la cama) e iniciar la marcha, ¿cuál es la primera maniobra que debe realizar el conductor?",
+        "image": "assets/senal_conduccion_en_equipo.webp",
+        "options": [
+            "Repostar cafeína de inmediato, ya que circular con el depósito vacío puede provocar una avería en la primera curva del día.",
+            "Hacer la cama, porque es la primera revisión que se completa con éxito y deja el vehículo listo para empezar la ruta con buen pie.",
+            "Circular en convoy: un Cari reposta el café y el otro hace la cama, ya que la conducción en equipo mejora la fluidez del tráfico y llega antes a destino."
+        ],
+        "correctIndex": 2,
+        "isPersonal": false,
+        "place": "cafeteria"
+    },
+    {
+        "text": "Que tendra que tener en cuanta al circular por esta via?",
+        "image": "assets/prohibido_el_paso_a_personas_que_no_se_quieran.webp",
+        "options": [
+            "No pasar si no se la quiere",
+            "Las dos personas que circulen por la via deben cogerse de la mano",
+            "Todas las anteriores"
+        ],
+        "correctIndex": -1,
+        "isPersonal": true,
+        "place": "la-mola"
+    },
+    {
+        "text": "Que le puede ocurrir al conductor a partir de esta señal?",
+        "image": "assets/zona_de_alta_concentracion_de_besos.webp",
+        "options": [
+            "El conductor va a empezar a distraerse para darle besos al copiloto",
+            "El copiloto va a tener una excusa para darle besos al conductor",
+            "Todas las anteriores"
+        ],
+        "correctIndex": -1,
+        "isPersonal": true,
+        "place": "la-mola"
+    },
+    {
+        "text": "Ante una propuesta de «ir al cine» un domingo por la tarde, ¿cuántas veces hay que decir «sí» para que la respuesta sea vinculante?",
+        "image": "assets/cine_siete_sies.webp",
+        "options": [
+            "Una sola vez (optimismo teórico).",
+            "Exactamente 7 veces, preferiblemente mientras se sube a La Mola. Aunque la estadística indica que, pese a los 7 «síes», hay un 100 % de probabilidad de que el vehículo nunca llegue a la sala de cine.",
+            "Da igual: siempre acabamos viendo una peli en el sofá."
+        ],
+        "correctIndex": -1,
+        "isPersonal": true,
+        "place": "cine"
+    },
+    {
+        "text": "Ante una discusión o 'choque' de opiniones, ¿cómo se aplica el protocolo PAS en nuestra relación?",
+        "image": "assets/protocolo_pas.webp",
+        "options": [
+            "Paciencia, Amor y Solución",
+            "Ponerse de morros, Apagar el móvil y Salir corriendo",
+            "Pedir algo rico para cenar, Abrazarse y Sonreír"
+        ],
+        "correctIndex": -1,
+        "isPersonal": true,
+        "place": "escuela"
+    },
+    {
+        "text": "A la vista de la señalización y ante la advertencia de que su Cariño se aproxima, ¿cuál debe ser la conducta del conductor?",
+        "image": "assets/Gemini_Generated_Image_mjnu81mjnu81mjnu.webp",
+        "options": [
+            "Detener la marcha de inmediato y asumir que la llegada del Cariño provocará una intercepción inevitable con abrazos y sorpresas.",
+            "Poner las luces de emergencia, bloquear las puertas y simular que no le ha visto llegar.",
+            "Continuar a velocidad constante tocando el claxon para advertirle de que no interrumpa el tráfico."
+        ],
+        "correctIndex": 0,
+        "isPersonal": false,
+        "place": "compras"
+    },
+    {
+        "text": "Si encuentra un agente de trafico con una señal como la indicada en la foto ¿cual es la maniobra correcta?",
+        "image": "assets/agente_trafico.webp",
+        "options": [
+            "Darse la vuelta, la señal es una rotonda claramente.",
+            "Detención obligatoria para todo el pueblo que se acerquen al agente.",
+            "Cogerselo en cuanto tenga la oportunidad."
+        ],
+        "correctIndex": 2,
+        "isPersonal": false,
+        "place": "compras",
+        "extra": "agente"
+    },
+    {
+        "text": "Al entrar en una zona comercial con detenciones frecuentes en cada escaparate, ¿cuál es la conducta correcta del copiloto cuando la que va de compras es ella?",
+        "image": "assets/senal_escaparates.webp",
+        "options": [
+            "Mantener el motor al ralentí, consultar el móvil y suspirar cada 30 segundos para indicar que el depósito de paciencia está en reserva.",
+            "Aplicar el reglamento de la ITV: el vehículo de él pasa revisión 2 o 3 veces al año con asistencia completa en tallas, colores y combinaciones; el de ella circula mucho más, así que ya se apañará solo.",
+            "Aplicar la norma de reciprocidad en la vía: buscar tallas, opinar sobre combinaciones y llevar las bolsas igual que hace ella. Y si el aburrimiento se enciende en el salpicadero, se compensa con un beso en cada probador."
+        ],
+        "correctIndex": 2,
+        "isPersonal": false,
+        "place": "placa-catalunya"
+    },
+    {
+        "text": "¿Qué indica esta señal cuadrada con varios carriles y corazones en ellos?",
+        "image": "assets/senal_carriles_amor.webp",
+        "options": [
+            "Indica los carriles reservados para la circulación de autobuses y taxis.",
+            "Indica que solo pueden circular los vehículos cuyas personas tengan el corazón enamorado a más de 120 pulsaciones por minuto.",
+            "Señaliza que la vía pasará a tener carriles adicionales más adelante."
+        ],
+        "correctIndex": 1,
+        "isPersonal": false,
+        "place": "gimnasio"
+    },
+    {
+        "text": "En pleno entrenamiento, el vehículo que la precede (su compañera de box) choca contra un obstáculo fijo (el cajón) al intentar superarlo en una serie de 20 saltos. ¿Cuál es la maniobra correcta a continuación?",
+        "image": "assets/caida_cajon.webp",
+        "options": [
+            "Reducir la velocidad, señalizar el obstáculo con los triángulos de emergencia y avisar al entrenador.",
+            "Analizar la trayectoria del vehículo siniestrado y elegir una ruta alternativa para superar el cajón sin incidencias.",
+            "Repetir exactamente la misma maniobra y estamparse en el mismo punto del cajón, ya que en una amistad de verdad hasta los siniestros se comparten a partes iguales."
+        ],
+        "correctIndex": 2,
+        "isPersonal": false,
+        "place": "gimnasio"
+    },
+    {
+        "text": "¿Cuál es la carga máxima autorizada para el vehiculo de nuestra relacion sin remolque?",
+        "image": "assets/carga_maxima_suenos.webp",
+        "options": [
+            "Hasta 3500Kg y un remolque de 750Kg",
+            "Lo que quepa en el maletero mas dos niños, dos perros y todos los sueños que queramos ir cargando por el camino",
+            "Los vehiculos virtuales o ephimeros no tienen limite de carga"
+        ],
+        "correctIndex": -1,
+        "isPersonal": true,
+        "place": "valencia"
+    },
+    {
+        "text": "En un control de salinidad realizado durante la cena, ¿cuál es la tasa máxima permitida?",
+        "image": "assets/control_salinidad.webp",
+        "options": [
+            "0,0 g/l, como los conductores noveles: la sal es opcional y cada uno se la echa en la mesa.",
+            "La que salga del salero en ese momento: unas noches la cena circula sin nada de sal y otras da positivo en el control.",
+            "La justa, comprobada probando antes de servir. Y en caso de duda, se para en el arcén y se le da a probar a ella, que es la examinadora oficial de sabores."
+        ],
+        "correctIndex": 2,
+        "isPersonal": false,
+        "place": "valencia"
+    },
+    {
+        "text": "Al finalizar el trayecto del día, ¿cuál es la forma correcta de estacionar los dos vehículos de la relación?",
+        "image": "assets/estacionamiento_relacion.webp",
+        "options": [
+            "En zonas distintas de la ciudad, para que cada uno tenga su espacio y no se rayen la pintura.",
+            "En doble fila y con los intermitentes puestos, que total es solo un momento.",
+            "Uno junto al otro, en el mismo sitio de siempre, para poder arrancar juntos a la mañana siguiente."
+        ],
+        "correctIndex": 2,
+        "isPersonal": false,
+        "place": "villena"
+    },
+    {
+        "text": "Al llegar a un cruce o intersección, ¿tiene el peatón prioridad de paso independientemente de si hay paso de cebra o no?",
+        "image": "assets/peaton_prioridad.webp",
+        "options": [
+            "No, como norma general los peatones solo tienen prioridad en los pasos debidamente señalizados.",
+            "Sí, siempre. Y más si ese peatón eres tú, en cuyo caso se detiene el tráfico mundial si hace falta para que cruces.",
+            "Solo si el vehículo se aproxima por su derecha o está dando marcha atrás."
+        ],
+        "correctIndex": 1,
+        "isPersonal": false,
+        "place": "malaga"
+    },
+    {
+        "text": "Circulando tranquilamente por el carril de nuestros planes de fin de semana, un vehículo familiar señaliza con insistencia que quiere incorporarse con un plan nuevo. ¿Cómo debe actuar el conductor?",
+        "image": "assets/incorporacion_planes_familiares.webp",
+        "options": [
+            "Ceder el carril completo, cancelar los planes propios y circular en caravana detrás del vehículo familiar todo el fin de semana.",
+            "Apagar las luces, tomar la primera salida y fingir que hay un atasco en la AP-7 hasta el lunes.",
+            "Permitir la incorporación con la distancia de seguridad adecuada: de vez en cuando hay hueco para la familia, pero el carril de nuestros planes tiene preferencia y nadie nos obliga a abandonarlo."
+        ],
+        "correctIndex": 2,
+        "isPersonal": false,
+        "place": "malaga"
+    },
+    {
+        "text": "Si vamos de camino a la Costa Brava por la AP-7, ¿qué maniobra hay que hacer si el conductor abre la boca?",
+        "image": "assets/conductor_comidita.webp",
+        "options": [
+            "Ignorarlo y seguir circulando.",
+            "Abrir el mapa y buscar inmediatamente los restaurantes cercanos.",
+            "Darle comidita mientras conduce."
+        ],
+        "correctIndex": 2,
+        "isPersonal": false,
+        "place": "ap7"
+    },
+    {
+        "text": "¿Qué equipamiento obligatorio debe llevar un plato de tomate para poder circular por la mesa?",
+        "image": "assets/equipamiento_tomate.webp",
+        "options": [
+            "Ninguno: el tomate cortado y solo en el plato cumple la normativa vigente en estilo minimalista.",
+            "Chaleco reflectante y dos triángulos de emergencia, por si el tomate sufre una avería.",
+            "Sal, orégano y ricotta. Circular sin ellos es infracción grave y conlleva la retirada de puntos... de besos."
+        ],
+        "correctIndex": 2,
+        "isPersonal": false,
+        "place": "masia"
+    },
+    {
+        "text": "La torre de control emite el aviso «CARI1 saliendo» para recoger a su pasajera en la oficina, una rotonda más allá. ¿Cuál es el medio de transporte más adecuado para este trayecto de 3 minutos?",
+        "image": "assets/vuelo_cari1.webp",
+        "options": [
+            "Transporte público: un autobús con dos transbordos y 40 minutos de espera, para que el reencuentro tenga más emoción.",
+            "Un vuelo comercial con escala en El Prat, por si acaso hay tráfico en la rotonda.",
+            "El vuelo CARI1 con el modo avión activado para ir más rápido: despega del parking, sobrevuela la rotonda y aterriza en la puerta de la oficina con servicio de besos a bordo incluido."
+        ],
+        "correctIndex": 2,
+        "isPersonal": false,
+        "place": "torre"
+    },
+    {
+        "text": "Viajando a Marte en el Tesla con cohetes, ¿qué distancia de seguridad hay que mantener con la copiloto?",
+        "image": "assets/marte_distancia.webp",
+        "options": [
+            "225 millones de kilómetros, por si acaso.",
+            "La de un brazo, para poder ir de la mano todo el viaje.",
+            "Ninguna: en gravedad cero cada uno flota a su aire."
+        ],
+        "correctIndex": 1,
+        "isPersonal": false,
+        "place": "lanzarote"
+    },
+    {
+        "text": "¿Cada cuanto se deben revisar los niveles de 'atención y mimos' en este vehículo?",
+        "image": "assets/niveles_mimos.webp",
+        "options": [
+            "Cada 10.000 km, ya que los fabricantes garantizan ese mínimo entre cambios de aceite.",
+            "Cuando salta el indicador de morrito delantero.",
+            "Constantemente (porque tu Cari es needy)."
+        ],
+        "correctIndex": -1,
+        "isPersonal": true,
+        "place": "lanzarote"
+    }
+]

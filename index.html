@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Autoescuela Cari</title>
+    <meta name="description" content="Examen de conducir · Edición especial">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Caveat:wght@700&family=Fredoka:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="game/game.css">
+    <link rel="stylesheet" href="game/looks.css">
+    <script>
+        // Sin WebGL → versión clásica 2D
+        (function () {
+            var ok = false;
+            try {
+                var c = document.createElement('canvas');
+                ok = !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
+            } catch (e) {}
+            if (!ok || new URLSearchParams(location.search).get('classic') === '1') {
+                location.replace('classic.html' + location.search);
+            }
+        })();
+    </script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <canvas id="scene"></canvas>
+
+    <button type="button" id="sfx-toggle" class="sfx-toggle" aria-label="Sonido" title="Sonido">🔊</button>
+
+    <!-- Carga -->
+    <div id="loading" class="overlay on">
+        <div class="loading-box">
+            <div class="loading-car">🚗💨</div>
+            <p>Preparando la isla…</p>
+            <div class="bar"><div id="loading-bar"></div></div>
+            <a id="classic-link" href="classic.html" hidden>¿Tarda mucho? Usar la versión clásica</a>
+        </div>
+    </div>
+
+    <!-- Portada -->
+    <section id="title-screen" class="overlay" hidden>
+        <div class="title-card">
+            <div id="title-logo" class="title-logo" title="Autoescuela Cari">L</div>
+            <h1 class="title">Autoescuela<br><span>Cari</span></h1>
+            <p class="title-sub">Examen de conducir · Permiso B de <em>Bonita</em></p>
+            <button id="btn-start" class="btn btn-big">START ▶</button>
+            <div id="tesla-box" class="tesla-box" hidden>
+                <p>🚘 <b>Unidad Tesla detectada.</b> Examen práctico disponible.</p>
+                <div class="row">
+                    <button id="btn-theater" class="btn btn-ghost">📺 Pantalla completa</button>
+                    <button id="btn-continue-route" class="btn">🏁 Continuar ruta</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marcador -->
+    <div id="hud" class="hud" hidden>
+        <span id="hud-stage"></span>
+        <span id="hud-count"></span>
+    </div>
+
+    <!-- Llegada a un lugar -->
+    <div id="place-banner" class="place-banner" hidden>
+        <div id="pb-name"></div>
+        <div id="pb-sub"></div>
+    </div>
+
+    <!-- Ruta entre lugares -->
+    <div id="route" class="route" hidden>
+        <div id="route-label" class="route-label"></div>
+        <div class="route-line">
+            <span id="route-from" class="route-end"></span>
+            <div class="route-track"><div id="route-fill"></div><span id="route-car">🚗</span></div>
+            <span id="route-to" class="route-end"></span>
+        </div>
+    </div>
+
+    <!-- Pregunta -->
+    <section id="question-card" class="question-card" hidden>
+        <div class="qc-head">
+            <span id="qc-place"></span>
+            <div class="qc-head-right">
+                <img id="qc-thumb" alt="Ver imagen" hidden>
+                <button type="button" id="qc-toggle" title="Plegar para ver la escena">👁 Ver escena</button>
+            </div>
+        </div>
+        <h2 id="qc-text"></h2>
+        <div id="qc-options" class="qc-options"></div>
+    </section>
+
+    <div id="toast" class="toast" hidden></div>
+    <div id="prompt" class="prompt" hidden>
+        <p id="prompt-text"></p>
+        <button id="prompt-btn" class="btn btn-big"></button>
+    </div>
+    <div id="drag-hint" class="drag-hint">🖱️ Arrastra para mirar alrededor</div>
+
+    <!-- Resultado de la teoría -->
+    <section id="theory-result" class="overlay dim" hidden>
+        <div class="card center">
+            <div id="tr-step1">
+                <h2>Corrigiendo el examen…</h2>
+                <div class="heart-meter">
+                    <svg width="0" height="0" style="position:absolute"><defs><clipPath id="heartClip" clipPathUnits="objectBoundingBox"><path d="M0.5 0.95 C 0.5 0.95, 0.05 0.65, 0.05 0.35 C 0.05 0.15, 0.25 0.05, 0.5 0.2 C 0.75 0.05, 0.95 0.15, 0.95 0.35 C 0.95 0.65, 0.5 0.95, 0.5 0.95 Z"/></clipPath></defs></svg>
+                    <div class="heart-shape"><div id="tr-fill"></div></div>
+                </div>
+                <p id="tr-pct" class="big-pct">0%</p>
+            </div>
+            <div id="tr-step2" hidden>
+                <h2>¡Teórico aprobado! 🎉</h2>
+                <p>0 fallos que importen y un 100% de compatibilidad.<br>El examen práctico se hace <b>en el coche</b>.</p>
+                <p class="hand">Bajad al Tesla y abrid esta web allí 🚗💨</p>
+                <div class="row">
+                    <button id="btn-tr-home" class="btn btn-ghost">Volver a la portada</button>
+                    <button id="btn-tr-continue" class="btn">Continuar aquí ▶</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fin de la Parte 2: sello de APTO -->
+    <section id="stage-result" class="overlay dim" hidden>
+        <div class="card center stage-card">
+            <div id="sr-stamp" class="stamp">APTO</div>
+            <h2 id="sr-title"></h2>
+            <p id="sr-text"></p>
+            <div class="row"><button id="sr-btn2" class="btn btn-ghost btn-big" hidden></button><button id="sr-btn" class="btn btn-love btn-big" hidden></button></div>
+        </div>
+    </section>
+
+    <!-- Cortinilla de capítulo entre partes -->
+    <section id="chapter" class="chapter" hidden>
+        <div class="ch-stars"></div>
+        <div class="ch-content">
+            <p id="ch-kicker" class="ch-kicker"></p>
+            <h1 id="ch-title" class="ch-title"></h1>
+            <div class="ch-hearts"><span>💗</span><span>💞</span><span>💗</span></div>
+            <p id="ch-sub" class="ch-sub"></p>
+            <button id="ch-btn" class="btn btn-big btn-love ch-btn"></button>
+        </div>
+    </section>
+
+    <!-- Última pregunta (cinemática) -->
+    <section id="cinematic" class="cinematic" hidden>
+        <span class="cw cw-1">Y</span>
+        <span class="cw cw-2">ahora</span>
+        <span class="cw cw-3">la</span>
+        <span class="cw cw-4">última</span>
+        <span class="cw cw-5">pregunta…</span>
+    </section>
+
+    <!-- Examen de circulación (final de la Parte 2, conducción con mando) -->
+    <section id="exam-hud" class="exam-hud" hidden>
+        <div class="ex-examiner">
+            <span class="ex-avatar">👨‍🏫</span>
+            <div><b>Examinador</b><p id="ex-say"></p></div>
+        </div>
+        <div id="ex-flash" class="ex-flash"></div>
+        <div class="ex-score">
+            <div class="ex-chip"><span>Faltas</span><b id="ex-faults">0</b></div>
+            <div class="ex-chip ex-chip-grave" hidden><span>Repetidas</span><b id="ex-graves">0</b></div>
+        </div>
+        <div class="ex-dash">
+            <span id="ex-blink-l" class="ex-blink">◀</span>
+            <div class="ex-speed"><b id="ex-kmh">0</b><small>km/h</small></div>
+            <span id="ex-limit" class="ex-limit">50</span>
+            <span id="ex-blink-r" class="ex-blink">▶</span>
+        </div>
+        <div id="ex-pad" class="ex-pad"></div>
+    </section>
+
+    <!-- La pedida -->
+    <section id="proposal" class="proposal" hidden>
+        <div class="pw-line">
+            <span class="pw pw-1">¿Quieres</span>
+            <span class="pw pw-2">casarte</span>
+            <span class="pw pw-3">conmigo?</span>
+        </div>
+        <div id="proposal-options" class="proposal-options">
+            <button class="btn btn-big btn-love">¡Sí, quiero!</button>
+            <button class="btn btn-big btn-love">¡Claro que sí!</button>
+        </div>
+    </section>
+
+    <!-- Celebración -->
+    <section id="celebration" class="overlay" hidden>
+        <div class="card center celebration-card">
+            <h1 class="celebrate-title">¡DIJO QUE SÍ!</h1>
+            <p class="sub">Examen práctico aprobado con Matrícula de Honor</p>
+            <div class="polaroid">
+                <img src="assets/foto_pareja.webp" alt="Nosotros">
+                <span>El inicio de nuestro viaje eterno… ✨</span>
+            </div>
+            <p>Has superado todas las fases teóricas y prácticas con un 100% de compatibilidad amorosa. ¡Te amo con todo mi corazón!</p>
+            <button id="btn-glovebox" class="btn">💝 Inspección final: la cajita del corazón</button>
+        </div>
+    </section>
+
+    <!-- Inspección final: la cajita roja con forma de corazón (debajo del mueble de la tele) -->
+    <section id="glovebox" class="overlay" hidden>
+        <div class="card glovebox-card">
+            <div id="gb-step1">
+                <h2>Inspección técnica final</h2>
+                <p>Antes de dar por aprobado el examen, queda un último trámite: busca <strong>debajo del mueble de la tele</strong> una cajita roja con forma de corazón. Dentro está <strong>la ficha técnica de nuestra relación</strong>.</p>
+                <button id="btn-gb-open" class="btn">💝 Ya la tengo en mis manos</button>
+            </div>
+            <div id="gb-step2" hidden>
+                <div class="monogram-seal" aria-label="Iniciales grabadas"><span id="couple-initials">C ♥ C</span></div>
+                <h2>Ficha técnica de nuestra relación</h2>
+                <ul class="spec-sheet">
+                    <li><span>🖋️</span><div><b>Pluma estilográfica</b><small>Con nuestras iniciales grabadas</small></div></li>
+                    <li><span>🫙</span><div><b>Tinta</b><small>Para que no se seque ningún recuerdo</small></div></li>
+                    <li><span>📖</span><div><b>Libreta de a bordo</b><small>Lo mejor que nos ha pasado desde que nos conocimos</small></div></li>
+                </ul>
+                <p class="hand">Empieza por el último año, y sigue escribiendo todo lo que viene después de hoy. Para estrenarla. 🥂</p>
+                <p class="dinner">Y para celebrarlo… ¡a cenar! Te he preparado una <b>pizza casera con forma de corazón</b> 🧡</p>
+                <button id="btn-gb-home" class="btn btn-ghost">Volver a la portada</button>
+            </div>
+        </div>
+    </section>
+
+    <div id="lightbox" class="overlay dim lightbox" hidden><img id="lightbox-img" alt=""></div>
+    <div id="fader" class="fader" hidden></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script src="data/places.js"></script>
+    <script src="data/practical-questions.js"></script>
+    <script src="shared/car-browser.js"></script>
+    <script src="sfx.js"></script>
+    <script type="module" src="game/main.js"></script>
+    <script>
+        // Si el módulo 3D no arranca en 20 s, ofrecer la versión clásica
+        setTimeout(function () {
+            if (!window.__gameReady) document.getElementById('classic-link').hidden = false;
+        }, 20000);
+    </script>
+</body>
+</html>

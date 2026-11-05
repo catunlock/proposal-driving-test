@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autoescuela Cari · Acceso</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔑</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Caveat:wght@700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Página pública: TODO va aquí dentro (el resto de la web exige la sesión) -->
+    <style>
+        :root {
+            --ink: #1b1b2f; --pink: #ff4d8d; --yellow: #ffd23f; --cream: #fffaf0; --green: #2ecc71; --red: #ff4757;
+            --font: 'Fredoka', system-ui, sans-serif; --head: 'Bangers', 'Fredoka', cursive; --hand: 'Caveat', cursive;
+        }
+        * { box-sizing: border-box; }
+        html { font-size: clamp(15px, 0.55vw + 9px, 20px); }
+        html, body { margin: 0; min-height: 100%; color: var(--ink); font-family: var(--font); -webkit-tap-highlight-color: transparent; }
+        body { background: linear-gradient(#5ec4ff 0%, #a9e2ff 55%, #d9f3ff 70%); min-height: 100vh; overflow-x: hidden; }
+
+        /* --- Paisaje cartoon de fondo --- */
+        .scene { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        .cloud { position: absolute; background: #fff; border-radius: 999px; box-shadow: 0 6px 0 rgba(27, 27, 47, .08); animation: drift linear infinite; }
+        .cloud::before, .cloud::after { content: ''; position: absolute; background: #fff; border-radius: 50%; }
+        .cloud::before { width: 55%; height: 160%; left: 14%; bottom: 20%; }
+        .cloud::after { width: 38%; height: 120%; right: 14%; bottom: 25%; }
+        @keyframes drift { from { transform: translateX(-30vw); } to { transform: translateX(130vw); } }
+        .hill { position: absolute; bottom: 70px; border-radius: 50% 50% 0 0; border: 4px solid var(--ink); }
+        .road { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #5d6275; border-top: 5px solid #efe3c4; }
+        .road::after { content: ''; position: absolute; left: 0; right: 0; top: 38px; height: 6px; background: repeating-linear-gradient(90deg, var(--yellow) 0 46px, transparent 46px 92px); animation: lines 1.2s linear infinite; }
+        @keyframes lines { to { background-position: -92px 0; } }
+        .car { position: absolute; bottom: 22px; font-size: 3rem; transform: scaleX(-1); animation: cruise 9s ease-in-out infinite; filter: drop-shadow(3px 3px 0 rgba(27, 27, 47, .35)); }
+        @keyframes cruise { 0% { left: -12%; } 50% { left: 46%; } 100% { left: 112%; } }
+
+        /* --- Tarjeta --- */
+        main { position: relative; z-index: 1; display: flex; justify-content: center; padding: 4vh 16px 120px; }
+        .card {
+            width: 100%; max-width: 640px; background: rgba(255, 250, 240, .9); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+            border: 4px solid var(--ink); border-radius: 26px; box-shadow: 8px 8px 0 var(--ink); padding: 26px 28px 24px;
+            animation: pop .7s cubic-bezier(.34, 1.56, .64, 1) both;
+        }
+        @keyframes pop { from { transform: scale(.85) translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+        .head { display: flex; align-items: center; gap: 16px; }
+        .logo { flex: none; width: 70px; height: 70px; display: grid; place-items: center; background: #fff; border: 4px solid var(--ink); border-radius: 14px; box-shadow: 4px 4px 0 var(--ink); font: 400 3rem/1 var(--head); color: #e8173b; animation: wobble 2.4s ease-in-out infinite; }
+        @keyframes wobble { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg) scale(1.05); } }
+        h1 { font: 400 clamp(2.4rem, 7vw, 3.6rem)/.92 var(--head); letter-spacing: 2px; margin: 0; color: #fff; -webkit-text-stroke: 2.5px var(--ink); text-shadow: 5px 5px 0 var(--ink); }
+        h1 span { color: var(--pink); }
+        .chip { display: inline-block; margin: 14px 0 6px; font-weight: 700; background: var(--yellow); border: 3px solid var(--ink); border-radius: 12px; padding: 4px 12px; box-shadow: 3px 3px 0 var(--ink); }
+        .intro { font-size: 1.1rem; line-height: 1.4; margin: 10px 0 16px; }
+
+        /* --- Matrícula (las casillas de la contraseña) --- */
+        .plate { position: relative; display: flex; align-items: stretch; margin: 0 auto 14px; width: max-content; max-width: 100%; background: #fff; border: 4px solid var(--ink); border-radius: 12px; box-shadow: 5px 5px 0 var(--ink); overflow: hidden; cursor: text; }
+        .plate .eu { display: grid; place-items: center; width: 42px; background: #1d4fbf; color: #fff; font: 700 1rem var(--font); line-height: 1; padding-top: 14px; position: relative; }
+        .plate .eu::before { content: '★'; position: absolute; top: 6px; font-size: .75rem; color: var(--yellow); }
+        /* --tw (ancho de casilla) lo calcula drawTiles para que la frase quepa entera */
+        .tiles { --tw: 46px; display: flex; gap: 6px; padding: 10px 12px; }
+        .tile { --tf: min(calc(var(--tw) * 1.2), 2.6rem); width: var(--tw); height: calc(var(--tf) * 1.4); display: grid; place-items: center; border-bottom: 4px solid #c9cbd6; font: 400 var(--tf)/1 var(--head); text-transform: uppercase; transition: transform .15s; }
+        .gap { width: calc(var(--tw) * .45); flex: none; }
+        .tile.filled { border-color: var(--ink); animation: tap .18s; }
+        .tile.cursor { border-color: var(--pink); }
+        @keyframes tap { 50% { transform: scale(1.14); } }
+        #guess { position: absolute; inset: 0; opacity: 0; font-size: 16px; width: 100%; border: 0; cursor: text; }
+        .plate:focus-within { box-shadow: 5px 5px 0 var(--pink); }
+        .actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        .btn { font: 700 1.25rem var(--font); color: var(--ink); background: var(--yellow); border: 3px solid var(--ink); border-radius: 16px; padding: .6em 1.4em; box-shadow: 0 6px 0 var(--ink); cursor: pointer; transition: transform .12s, box-shadow .12s; }
+        .btn:hover { transform: translateY(-2px) rotate(-1deg); box-shadow: 0 8px 0 var(--ink); }
+        .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--ink); }
+        .btn-ghost { background: #fff; font-size: 1.05rem; }
+        .msg { min-height: 1.8em; text-align: center; font: 700 1.5rem var(--hand); color: #b0306a; margin: 12px 0 2px; }
+        .shake { animation: shake .45s; }
+        @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+
+        /* --- Intentos (en amarillo los que iban bien encaminados) --- */
+        .tries { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 6px 0 4px; }
+        .try { font: 400 1.15rem var(--head); letter-spacing: 1px; text-transform: uppercase; background: #e8e8ef; border: 2px solid var(--ink); border-radius: 8px; padding: 2px 10px; text-decoration: line-through 2px var(--red); }
+        .try.hot { background: var(--yellow); }
+
+        /* --- Pistas --- */
+        h2 { font: 400 1.8rem var(--head); letter-spacing: 1.5px; margin: 18px 0 8px; color: var(--pink); -webkit-text-stroke: 1px var(--ink); text-shadow: 2px 2px 0 var(--ink); }
+        .hints { display: grid; gap: 10px; }
+        .hint { display: flex; gap: 12px; align-items: flex-start; background: #fff; border: 3px solid var(--ink); border-radius: 14px; padding: 10px 14px; box-shadow: 3px 3px 0 var(--ink); font-size: 1.05rem; line-height: 1.35; }
+        .hint .ico { flex: none; font-size: 1.6rem; line-height: 1; }
+        .hint.locked { background: #ececf3; color: #8a8aa0; box-shadow: none; border-style: dashed; }
+        .hint.new { animation: unlock .6s cubic-bezier(.34, 1.56, .64, 1); }
+        @keyframes unlock { from { transform: scale(.8) rotate(-2deg); opacity: 0; } to { transform: none; opacity: 1; } }
+        .emojis { font-size: 1.5em; letter-spacing: 2px; }
+        .foot { text-align: center; font-size: .85rem; color: #666; margin-top: 16px; }
+
+        .success .tile { background: var(--green); color: #fff; border-radius: 8px; border-bottom-color: transparent; animation: wave .6s calc(var(--i) * 70ms) both; }
+        @keyframes wave { 40% { transform: translateY(-14px) rotate(-6deg); } }
+
+        @media (max-width: 520px) {
+            .card { padding: 20px 16px; }
+            .tiles { gap: 3px; padding: 8px; }
+            .try { font-size: 1rem; }
+            .plate .eu { width: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scene" aria-hidden="true">
+        <div class="cloud" style="top:9%;width:120px;height:38px;animation-duration:70s;animation-delay:-20s"></div>
+        <div class="cloud" style="top:22%;width:170px;height:48px;animation-duration:95s;animation-delay:-60s"></div>
+        <div class="cloud" style="top:5%;width:90px;height:30px;animation-duration:60s;animation-delay:-5s"></div>
+        <div class="hill" style="left:-8%;width:46%;height:200px;background:#8fd16a"></div>
+        <div class="hill" style="left:28%;width:44%;height:150px;background:#6fbf5a"></div>
+        <div class="hill" style="right:-10%;width:48%;height:230px;background:#83c164"></div>
+        <div class="road"></div>
+        <div class="car">🚗</div>
+    </div>
+
+    <main>
+        <section class="card" id="card">
+            <div class="head">
+                <div class="logo" aria-hidden="true">L</div>
+                <h1>Autoescuela <span>Cari</span></h1>
+            </div>
+            <div class="chip">🔒 Control de acceso · Examen confidencial</div>
+            <p class="intro">Antes de empezar el examen, el sistema necesita la <b>contraseña secreta</b>.
+                Escríbela en la matrícula 👇 Si no te sale, cada intento desbloquea una pista.</p>
+
+            <form id="form" autocomplete="off">
+                <label class="plate" id="plate" for="guess">
+                    <span class="eu">E</span>
+                    <span class="tiles" id="tiles"></span>
+                    <input id="guess" name="guess" type="text" maxlength="24" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Contraseña" autofocus>
+                </label>
+                <div class="actions">
+                    <button class="btn" type="submit">🔑 Arrancar</button>
+                    <button class="btn btn-ghost" type="button" id="more">💡 Otra pista</button>
+                </div>
+            </form>
+            <div class="msg" id="msg" role="status"></div>
+            <div class="tries" id="tries"></div>
+
+            <h2>Pistas</h2>
+            <div class="hints" id="hints"></div>
+            <p class="foot">Pista extra: mayúsculas, espacios y acentos dan igual 😉</p>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script>
+        // ------------------------------------------------------------------
+        //  PISTAS (en orden). La primera se ve desde el principio; las demás
+        //  se desbloquean con cada intento fallido o con «Otra pista».
+        //  La contraseña NO está aquí: se comprueba en el servidor (api/login.js).
+        //  Las pistas evocan, no deletrean: ni con todas juntas se puede sacar
+        //  sin haberla oído (no dicen letras, ni cuántas tiene).
+        // ------------------------------------------------------------------
+        let SLOTS = [7];        // casillas por palabra; las pide al servidor (GET /api/login)
+        const HINTS = [
+            // Ejemplo para GAME_PASSWORD="Te quiero": cámbialas por las de tu contraseña
+            ['💬', 'No es una palabra suelta: es <b>una frase que te digo todos los días</b>.'],
+            ['☀️', 'Te la digo <b>al despertar</b>… y también <b>antes de dormir</b>.'],
+            ['📱', 'Suele ir al final de mis mensajes, justo antes del corazón.'],
+            ['🎬', 'En emojis:<br><span class="emojis">🫵 + ❤️</span>'],
+            ['🤫', 'Última pista: es <b>lo que siento por ti</b> 😉']
+        ];
+        const FAILS = ['¡Uy! Ese no es 🙈', 'Casi… o no 😅', '¡Suspendida! Prueba otra vez 🚦', 'Nop. ¡Mira las pistas! 💡', 'Frío, frío… 🧊', 'Ese no arranca el motor 🔧'];
+
+        const $ = id => document.getElementById(id);
+        const input = $('guess'), tiles = $('tiles'), msg = $('msg');
+        let unlocked = 1, tries = 0, busy = false;
+
+        // Las letras rellenan las casillas de corrido (los espacios que escriba dan igual) y entre
+        // palabra y palabra queda un hueco, como en una matrícula de verdad.
+        function drawTiles() {
+            const v = input.value.toUpperCase().replace(/\s+/g, '');
+            const n = Math.max(SLOTS.reduce((a, b) => a + b, 0), v.length);
+            const breaks = new Set(SLOTS.slice(0, -1).map((_, i) => SLOTS.slice(0, i + 1).reduce((a, b) => a + b, 0)));
+            // casillas tan anchas como quepan (los huecos ocupan media)
+            const cs = getComputedStyle(tiles), gap = parseFloat(cs.columnGap) || 0;
+            const room = $('form').clientWidth - $('plate').querySelector('.eu').offsetWidth - parseFloat(cs.paddingLeft) * 2 - 8;
+            const cells = n + breaks.size;
+            tiles.style.setProperty('--tw', Math.max(14, Math.min(46, (room - gap * (cells - 1)) / (n + 0.45 * breaks.size))) + 'px');
+            tiles.innerHTML = '';
+            for (let i = 0; i < n; i++) {
+                if (breaks.has(i)) tiles.appendChild(Object.assign(document.createElement('span'), { className: 'gap' }));
+                const t = document.createElement('span');
+                t.className = 'tile' + (v[i] ? ' filled' : '') + (i === v.length && document.activeElement === input ? ' cursor' : '');
+                t.textContent = v[i] || '';
+                t.style.setProperty('--i', i);
+                tiles.appendChild(t);
+            }
+        }
+        function drawHints() {
+            const box = $('hints');
+            box.innerHTML = '';
+            HINTS.forEach(([ico, html], i) => {
+                const d = document.createElement('div');
+                if (i < unlocked) { d.className = 'hint' + (i === unlocked - 1 && i > 0 ? ' new' : ''); d.innerHTML = `<span class="ico">${ico}</span><div>${html}</div>`; }
+                else { d.className = 'hint locked'; d.innerHTML = `<span class="ico">🔒</span><div>Pista ${i + 1}: se desbloquea con el próximo intento</div>`; }
+                box.appendChild(d);
+            });
+            $('more').hidden = unlocked >= HINTS.length;
+        }
+        function addTry(text, hot) {
+            const t = document.createElement('span');
+            t.className = 'try' + (hot ? ' hot' : '');
+            t.textContent = text;
+            $('tries').prepend(t);
+        }
+        function shake() { const c = $('plate'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); }
+
+        // Pitido de claxon y fanfarria (sin archivos)
+        let ac = null;
+        function beep(notes) {
+            try {
+                ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+                notes.forEach(([f, t, d, type]) => {
+                    const o = ac.createOscillator(), g = ac.createGain();
+                    o.type = type || 'triangle'; o.frequency.value = f;
+                    g.gain.setValueAtTime(0.0001, ac.currentTime + t);
+                    g.gain.exponentialRampToValueAtTime(0.18, ac.currentTime + t + 0.02);
+                    g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + t + d);
+                    o.connect(g).connect(ac.destination); o.start(ac.currentTime + t); o.stop(ac.currentTime + t + d + 0.05);
+                });
+            } catch (e) { /* sin sonido */ }
+        }
+
+        function goNext() {
+            const n = new URLSearchParams(location.search).get('next');
+            location.href = n && n.startsWith('/') && !n.startsWith('//') ? n : '/';
+        }
+
+        input.addEventListener('input', () => { input.value = input.value.replace(/\s+/g, ' ').replace(/^ /, ''); drawTiles(); });
+        addEventListener('resize', drawTiles);
+        input.addEventListener('focus', drawTiles);
+        input.addEventListener('blur', drawTiles);
+        $('more').addEventListener('click', () => { if (unlocked < HINTS.length) { unlocked++; drawHints(); } input.focus(); });
+
+        $('form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (busy) return;
+            const guess = input.value.trim();
+            if (!guess) { msg.textContent = 'Escribe algo en la matrícula 😉'; shake(); return; }
+            busy = true;
+            try {
+                const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ guess }), credentials: 'same-origin' });
+                const data = await r.json();
+                if (data.ok) {
+                    msg.textContent = '¡Contraseña correcta! Arrancando motor… 🚗💨';
+                    $('card').classList.add('success');
+                    beep([[523, 0, .25], [659, .12, .25], [784, .24, .3], [1047, .38, .6]]);
+                    if (window.confetti) confetti({ particleCount: 160, spread: 90, origin: { y: 0.6 }, colors: ['#ff4d8d', '#ffd23f', '#5ec4ff', '#ffffff'] });
+                    setTimeout(goNext, 1900);
+                    return;
+                }
+                tries++;
+                addTry(guess, data.hot);
+                msg.textContent = data.hot === 'close' ? '¡Casi casi! 🔥 Revisa cómo lo escribes'
+                    : data.hot === 'half' ? '¡Una parte está bien! 👀 Te falta la otra'
+                    : FAILS[(tries - 1) % FAILS.length];
+                beep([[392, 0, .18, 'square'], [330, .2, .25, 'square']]);
+                shake();
+                if (unlocked < HINTS.length) unlocked++;
+                drawHints();
+                input.value = ''; drawTiles(); input.focus();
+            } catch (err) {
+                msg.textContent = 'Sin conexión con la autoescuela… vuelve a probar 📡';
+            } finally { busy = false; }
+        });
+
+        drawTiles(); drawHints();
+        fetch('/api/login').then(r => r.json()).then(d => { if (d.slots && d.slots.length) { SLOTS = d.slots; drawTiles(); } }).catch(() => { /* se queda con 7 */ });
+    </script>
+</body>
+</html>

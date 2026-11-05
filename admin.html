@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Simulador DGT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+        .question-list-item {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+        }
+        .question-list-item h4 {
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .admin-actions button {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            width: auto;
+        }
+        .admin-actions button.edit {
+            background-color: var(--secondary);
+            color: var(--text-color);
+        }
+        .admin-actions button.delete {
+            background-color: var(--error);
+            color: white;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            font-family: 'Outfit', sans-serif;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .options-group {
+            border: 1px dashed var(--glass-border);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .preview-img {
+            max-height: 100px;
+            margin-top: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-logo">
+                <span class="logo-heart">⚙️</span>
+                <span>Admin</span>
+            </div>
+            <div class="header-title">
+                Gestión de Preguntas (Test 1)
+            </div>
+        </div>
+    </header>
+
+    <div id="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <main id="main-content">
+        <div class="admin-container">
+            <!-- List Screen -->
+            <div id="list-screen" class="glass-panel screen active">
+                <h2>Preguntas Actuales</h2>
+                <div class="button-group" style="margin-bottom: 20px;">
+                    <button id="btn-add-new" class="btn-primary">+ Añadir Nueva Pregunta</button>
+                    <button id="btn-save-all" class="btn-success" style="background-color: var(--success); color: white; box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);">Guardar Cambios en Servidor</button>
+                    <a href="index.html" style="text-decoration: none;"><button class="btn-secondary">Volver al Simulador</button></a>
+                </div>
+                <div id="questions-list">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Editor Form Screen -->
+            <div id="editor-screen" class="glass-panel screen hidden">
+                <h2 id="editor-title">Editar Pregunta</h2>
+                <form id="question-form">
+                    <div class="form-group">
+                        <label>Texto de la Pregunta:</label>
+                        <input type="text" id="q-text" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Lugar de la isla (parada):</label>
+                        <select id="q-place"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Imagen Adjunta:</label>
+                        <input type="file" id="q-image-file" accept="image/*">
+                        <input type="hidden" id="q-image-url">
+                        <img id="q-image-preview" class="preview-img" src="">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Opciones de Respuesta:</label>
+                        <div class="options-group">
+                            <input type="text" class="q-option" placeholder="Opción 1" required style="margin-bottom: 5px;">
+                            <input type="text" class="q-option" placeholder="Opción 2" required style="margin-bottom: 5px;">
+                            <input type="text" class="q-option" placeholder="Opción 3" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Índice de Respuesta Correcta:</label>
+                        <select id="q-correct-index">
+                            <option value="0">Opción 1</option>
+                            <option value="1">Opción 2</option>
+                            <option value="2">Opción 3</option>
+                            <option value="-1">Cualquiera es correcta (Personal)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display:flex; align-items:center; gap: 8px;">
+                            <input type="checkbox" id="q-is-personal">
+                            ¿Es pregunta personal? (Si es personal, el índice correcto puede ser cualquiera)
+                        </label>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary">Guardar en Lista</button>
+                        <button type="button" id="btn-cancel-edit" class="btn-secondary">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="data/places.js"></script>
+
+    <script src="admin.js"></script>
+</body>
+</html>

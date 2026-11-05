@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen Teórico de Conducir 2026 - DGT</title>
+    <meta name="description" content="Simulador oficial de examen teórico para el permiso B.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Caveat:wght@600;700&family=Chakra+Petch:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=Jost:wght@300;400;500;600&family=Orbitron:wght@500;700;900&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="themes.css">
+    <script>
+        // Aplica el tema guardado antes de pintar para evitar parpadeos
+        try {
+            var t = new URLSearchParams(location.search).get('theme') || localStorage.getItem('theme') || 'toon';
+            if (t && t !== 'classic') document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+    </script>
+</head>
+<body>
+    <button type="button" id="sfx-toggle" class="sfx-toggle" aria-label="Sonido" title="Sonido">🔊</button>
+    <nav id="theme-switcher" aria-label="Selector de estilo">
+        <button type="button" class="ts-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Cambiar estilo" title="Cambiar estilo">🎨</button>
+        <div class="ts-options" role="menu" hidden>
+            <button type="button" data-theme="classic" aria-pressed="false">🏛️ Clásico</button>
+            <button type="button" data-theme="toon" aria-pressed="true">🎨 Cartoon</button>
+            <button type="button" data-theme="synthwave" aria-pressed="false">🌆 Synthwave</button>
+            <button type="button" data-theme="noir" aria-pressed="false">🖤 W Noir</button>
+        </div>
+    </nav>
+    <div id="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <header class="app-header">
+        <div class="header-content">
+            <!-- Elemento de audio para la música de suspense (Fase Final) -->
+            <audio id="suspense-music" src="suspense_romantic.wav" preload="auto" loop></audio>
+            <!-- Elemento de audio para la música alegre (Propuesta) -->
+            <audio id="happy-music" src="happy_romantic.wav" preload="auto" loop></audio>
+            
+            <div class="header-logo">
+                <span class="logo-text">DGT</span>
+                <span class="logo-heart">❤️</span>
+            </div>
+            <span class="header-title">Dirección General de Tráfico - Sede Electrónica</span>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <div id="app">
+            <!-- Pantalla de Inicio -->
+        <section id="home-screen" class="screen active">
+            <div class="glass-panel">
+                <div class="logo-container" id="secret-trigger" style="cursor: pointer;">
+                    <div class="shield">DGT</div>
+                </div>
+                <h1>Simulador de Examen Teórico</h1>
+                <p>Permiso de conducción de la clase B</p>
+                <div class="button-group">
+                    <button class="btn-primary test-btn" onclick="startTest(1)">Test Oficial 1</button>
+                    <button class="btn-secondary test-btn" onclick="startTest(1)">Test Oficial 2</button>
+                    <button class="btn-secondary test-btn" onclick="startTest(1)">Test Oficial 3</button>
+                    <button class="btn-secondary test-btn" onclick="startTest(1)">Test Oficial 4</button>
+                </div>
+                
+                <!-- Banner Especial Tesla / Local Debug -->
+                <div id="tesla-banner" class="tesla-banner d-none">
+                    <div class="tesla-banner-divider"></div>
+                    <div class="tesla-banner-content">
+                        <span class="tesla-icon">🚘</span>
+                        <div class="tesla-banner-text">
+                            <h3>Unidad Tesla Detectada</h3>
+                            <p class="banner-desc">Examen práctico de conducción disponible para este vehículo.</p>
+                        </div>
+                    </div>
+                    <div class="tesla-button-group">
+                        <button id="btn-tesla-fullscreen" class="btn-tesla-action btn-secondary" onclick="enterTeslaTheater()">📺 Pantalla Completa (Modo Teatro)</button>
+                        <button id="btn-tesla-start" class="btn-tesla-action btn-primary" onclick="startPracticalTest()">🏁 Iniciar Examen Práctico</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla de Test -->
+        <section id="test-screen" class="screen hidden">
+            <div class="glass-panel test-panel">
+                <div class="test-header">
+                    <span id="question-counter">Pregunta 1/30</span>
+                    <div class="progress-bar-container">
+                        <div id="progress-bar" class="progress-bar"></div>
+                    </div>
+                </div>
+                <div class="question-container">
+                    <h2 id="question-text">¿Pregunta?</h2>
+                    <div id="image-container" class="d-none">
+                        <!-- Espacio por si alguna pregunta lleva imagen -->
+                    </div>
+                </div>
+                <div id="options-container" class="options-container">
+                    <!-- Los botones se generarán aquí -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla de Animación (Corazón) -->
+        <section id="animation-screen" class="screen hidden">
+            <div class="glass-panel center-content" style="text-align: center; padding: 60px 30px;">
+                <h2 style="margin-bottom: 30px;">Procesando resultados...</h2>
+                
+                <div style="position: relative; width: 150px; height: 150px; margin: 0 auto; filter: drop-shadow(0 10px 15px rgba(244, 63, 94, 0.3));">
+                    <svg style="width: 0; height: 0; position: absolute;">
+                        <defs>
+                            <clipPath id="heartMask" clipPathUnits="objectBoundingBox">
+                                <path d="M0.5 0.95 C 0.5 0.95, 0.05 0.65, 0.05 0.35 C 0.05 0.15, 0.25 0.05, 0.5 0.2 C 0.75 0.05, 0.95 0.15, 0.95 0.35 C 0.95 0.65, 0.5 0.95, 0.5 0.95 Z" />
+                            </clipPath>
+                        </defs>
+                    </svg>
+                    <!-- Contenedor estático con la forma de corazón -->
+                    <div style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; clip-path: url(#heartMask); background: #ffe4e6; overflow: hidden;">
+                        <!-- Rectángulo de relleno que sube -->
+                        <div id="heart-fill-element" style="width: 100%; height: 100%; background: linear-gradient(135deg, #ff7eb3, #f43f5e); position: absolute; bottom: 0; left: 0; transform: translateY(100%); transition: transform 3s ease-in-out;"></div>
+                    </div>
+                </div>
+                <p id="animation-percentage" style="margin-top: 20px; font-size: 1.8rem; font-weight: 700; color: var(--primary);">0%</p>
+            </div>
+        </section>
+
+        <!-- Pantalla de Resultados Intermedios/Finales -->
+        <section id="result-screen" class="screen hidden">
+            <div class="glass-panel center-content">
+                <h2 id="result-title">Test Finalizado</h2>
+                <p id="result-message">Has completado el simulacro.</p>
+                <button id="btn-back-home" class="btn-primary">Volver al Inicio</button>
+            </div>
+        </section>
+
+        <!-- Pantalla Pre-Propuesta -->
+        <section id="pre-proposal-screen" class="screen hidden">
+            <div class="glass-panel center-content" style="text-align: center;">
+                <h2>Instrucciones Finales</h2>
+                <p id="pre-proposal-message" style="font-size: 1.3rem; margin-top: 20px;">Escucha al profesor, cuando estés lista presiona continuar.</p>
+                <button id="btn-continue-proposal" class="btn-primary" style="margin-top: 20px;">Continuar</button>
+            </div>
+        </section>
+
+        <!-- Pantalla de Propuesta (Final Test 2) -->
+        <section id="proposal-screen" class="screen hidden">
+            <div class="glass-panel proposal-panel">
+                <h1 class="proposal-text">¿Te quieres casar conmigo?</h1>
+                <div class="proposal-options">
+                    <button class="btn-proposal" onclick="celebrate()">¡Sí!</button>
+                    <button class="btn-proposal" onclick="celebrate()">Obvio</button>
+                    <button class="btn-proposal" onclick="celebrate()">Por supuesto</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla de Examen Práctico (Fase 2 - Tesla Mode) -->
+        <section id="practical-test-screen" class="screen hidden">
+            <div class="glass-panel test-panel practical-panel">
+                <div class="test-header">
+                    <span id="practical-counter">Parte 2: El coche · Pregunta 1/4</span>
+                    <div class="progress-bar-container">
+                        <div id="practical-progress-bar" class="progress-bar"></div>
+                    </div>
+                </div>
+                <div class="question-container">
+                    <h2 id="practical-question-text">¿Pregunta de compromiso?</h2>
+                    <div id="practical-image-container" class="d-none">
+                        <!-- Las imágenes se renderizarán dinámicamente -->
+                    </div>
+                </div>
+                <div id="practical-options-container" class="options-container">
+                    <!-- Botones Acepto / No acepto -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla de Introducción a la Última Pregunta (Fase Final Tesla) -->
+        <section id="last-question-intro-screen" class="screen hidden">
+            <div class="last-question-intro-container">
+                <div class="cinematic-words-container">
+                    <span class="cinematic-word c-word-1">Y</span>
+                    <span class="cinematic-word c-word-2">ahora</span>
+                    <span class="cinematic-word c-word-3">la</span>
+                    <span class="cinematic-word c-word-4">última</span>
+                    <span class="cinematic-word c-word-5">pregunta...</span>
+                    <span class="cinematic-word c-word-6">🤫❤️</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla de Propuesta de Matrimonio Especial (Fase Final Tesla) -->
+        <section id="marriage-proposal-screen" class="screen hidden">
+            <div class="marriage-proposal-container">
+                <div class="slow-words-container">
+                    <span class="slow-word word-1">¿Quieres</span>
+                    <span class="slow-word word-2">casarte</span>
+                    <span class="slow-word word-3">conmigo?</span>
+                </div>
+                <div id="marriage-options" class="marriage-options hidden">
+                    <button id="btn-marriage-yes" class="btn-marriage btn-yes" onclick="celebrateProposal()">Sí, quiero! 💍</button>
+                    <button id="btn-marriage-yes2" class="btn-marriage btn-yes" onclick="celebrateProposal()">¡Claro que sí! ❤️</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla de Celebración Final (Fase Final Tesla) -->
+        <section id="final-celebration-screen" class="screen hidden">
+            <div class="glass-panel celebration-panel">
+                <div class="heart-pulse-container">
+                    <svg class="pulsing-heart-svg" viewBox="0 0 32 29.6">
+                        <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
+                        c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+                    </svg>
+                </div>
+                <h1 class="celebration-title">¡DIJO QUE SÍ! 💍❤️</h1>
+                <p class="celebration-subtitle">Examen Práctico Aprobado con Matrícula de Honor</p>
+                
+                <div class="polaroid-frame animate-polaroid">
+                    <img id="celebration-image" src="assets/foto_pareja.webp" alt="Nosotros">
+                    <div class="polaroid-caption">El inicio de nuestro viaje eterno... ✨</div>
+                </div>
+                
+                <div class="celebration-text">
+                    <p>Has superado todas las fases teóricas y prácticas con un 100% de compatibilidad amorosa. ¡Te amo con todo mi corazón!</p>
+                </div>
+                
+                <button id="btn-glovebox" class="btn-primary" style="max-width: 320px; margin: 30px auto 0 auto;" onclick="openGlovebox()">💝 Inspección final: la cajita del corazón</button>
+                <button id="btn-celebration-restart" class="btn-secondary" style="max-width: 250px; margin: 16px auto 0 auto;" onclick="showHome()">Volver al Inicio</button>
+            </div>
+        </section>
+
+        <!-- Inspección final: cajita roja de corazón debajo del mueble de la tele (pluma, tinta y libreta) -->
+        <section id="glovebox-screen" class="screen hidden">
+            <div class="glass-panel glovebox-panel">
+                <div id="glovebox-step-1">
+                    <div class="glovebox-icon">💝</div>
+                    <h2>Inspección técnica final</h2>
+                    <p>Antes de dar por aprobado el examen, queda un último trámite: busca <strong>debajo del mueble de la tele</strong> una cajita roja con forma de corazón. Dentro está <strong>la ficha técnica de nuestra relación</strong>.</p>
+                    <button class="btn-primary" onclick="revealGift()">Ya la tengo en mis manos</button>
+                </div>
+                <div id="glovebox-step-2" class="d-none">
+                    <div class="monogram-seal" aria-label="Iniciales grabadas"><span id="couple-initials">C ♥ C</span></div>
+                    <h2>Ficha técnica de nuestra relación</h2>
+                    <ul class="spec-sheet">
+                        <li><span>🖋️</span><div><b>Pluma estilográfica</b><small>Con nuestras iniciales grabadas</small></div></li>
+                        <li><span>🫙</span><div><b>Tinta</b><small>Para que no se seque ningún recuerdo</small></div></li>
+                        <li><span>📖</span><div><b>Libreta de a bordo</b><small>Lo mejor que nos ha pasado desde que nos conocimos</small></div></li>
+                    </ul>
+                    <p class="glovebox-note">Empieza por el último año, y sigue escribiendo todo lo que viene después de hoy. Para estrenarla. 🥂</p>
+                    <p class="glovebox-note">Y para celebrarlo… ¡a cenar! Te he preparado una <b>pizza casera con forma de corazón</b> 🧡</p>
+                    <button class="btn-secondary" style="margin-top: 10px;" onclick="showHome()">Volver al Inicio</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Ministerio del Interior. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <canvas id="confetti-canvas" class="d-none"></canvas>
+
+    <!-- Confetti script para el final -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script src="data/practical-questions.js"></script>
+    <script src="shared/car-browser.js"></script>
+    <script src="sfx.js"></script>
+    <script src="themes.js"></script>
+    <script src="main.js"></script>
+
+    <!-- Lightbox Modal for Images -->
+    <div id="image-modal" class="modal hidden">
+        <span class="modal-close" onclick="closeImageModal()">&times;</span>
+        <img class="modal-content" id="modal-img">
+    </div>
+</body>
+</html>
