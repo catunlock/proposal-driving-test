@@ -594,7 +594,9 @@ async function build(app) {
 // ============================================================================
 //  EL EXAMEN
 // ============================================================================
-export async function buildExam(app) {
+// opts.phys / opts.pts: física y huella de otro coche (modo conducción, game/drive/exam-mode.js)
+export async function buildExam(app, opts = {}) {
+    const PH = opts.phys || PHYS, PTS = opts.pts || CAR_PTS;
     const R = buildRoute();
     const W = await build(app);
     const input = new Input();
@@ -730,7 +732,7 @@ export async function buildExam(app) {
             };
             const blocked = (x, z, h) => {
                 const fx = Math.sin(h), fz = Math.cos(h), rx = -fz, rz = fx;
-                for (const [lx, lz] of CAR_PTS) {
+                for (const [lx, lz] of PTS) {
                     const px = x + fx * lz + rx * lx, pz = z + fz * lz + rz * lx;
                     if (!onRoad(px, pz)) return 'curb';
                     for (const o of W.obstacles) if (px > o.x0 && px < o.x1 && pz > o.z0 && pz < o.z1) return 'car';
@@ -789,24 +791,24 @@ export async function buildExam(app) {
                 let v = st.v, acc = 0;
                 const coast = inp.thr < 0.03 && inp.brk < 0.03;
                 if (v >= -0.05) {
-                    if (inp.thr > 0.03) acc += inp.thr * PHYS.accel * (1 - Math.max(0, v) / PHYS.maxV * 0.55);
+                    if (inp.thr > 0.03) acc += inp.thr * PH.accel * (1 - Math.max(0, v) / PH.maxV * 0.55);
                     if (inp.brk > 0.03) {
-                        if (v > 0.15) acc -= inp.brk * PHYS.brake;
-                        else { st.revT += dt; if (st.revT > 0.35) acc -= inp.brk * PHYS.accel * 0.6; else { v = 0; } }
+                        if (v > 0.15) acc -= inp.brk * PH.brake;
+                        else { st.revT += dt; if (st.revT > 0.35) acc -= inp.brk * PH.accel * 0.6; else { v = 0; } }
                     } else st.revT = 0;
                 } else {
-                    if (inp.thr > 0.03) acc += inp.thr * PHYS.brake;
-                    if (inp.brk > 0.03) acc -= inp.brk * PHYS.accel * 0.6;
+                    if (inp.thr > 0.03) acc += inp.thr * PH.brake;
+                    if (inp.brk > 0.03) acc -= inp.brk * PH.accel * 0.6;
                 }
-                acc -= v * PHYS.drag + Math.sign(v) * PHYS.roll * (coast ? 1 : 0.25);
+                acc -= v * PH.drag + Math.sign(v) * PH.roll * (coast ? 1 : 0.25);
                 let nv = v + acc * dt;
                 if ((coast || (v > 0 && inp.brk > 0.03 && st.revT <= 0.35)) && Math.sign(nv) !== Math.sign(v) && v !== 0) nv = 0;
                 if (v < 0 && inp.thr > 0.03 && nv > 0) nv = 0;
-                st.v = THREE.MathUtils.clamp(nv, -PHYS.maxRev, PHYS.maxV);
+                st.v = THREE.MathUtils.clamp(nv, -PH.maxRev, PH.maxV);
                 // Dirección: más suave cuanto más rápido
-                const target = inp.steer * PHYS.steerMax / (1 + Math.abs(st.v) * 0.085);
+                const target = inp.steer * PH.steerMax / (1 + Math.abs(st.v) * 0.085);
                 st.steer += (target - st.steer) * Math.min(1, dt * 7);
-                const yawRate = -st.v / PHYS.wheelbase * Math.tan(st.steer);
+                const yawRate = -st.v / PH.wheelbase * Math.tan(st.steer);
                 const nh = st.h + yawRate * dt;
                 const nx = st.x + Math.sin(nh) * st.v * dt, nz = st.z + Math.cos(nh) * st.v * dt;
                 const hit = blocked(nx, nz, nh);

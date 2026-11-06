@@ -1,0 +1,131 @@
+/* Modo conducción: menús (modo, garaje, circuito), pausa, resultados y HUD de carrera */
+body.drive { background: #1b1b2f; }
+#d-loading-bar { height: 100%; width: 0; background: var(--pink); transition: width .2s; }
+
+/* --- Pantallas de menú -------------------------------------------------- */
+.d-screen {
+    position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; gap: 18px;
+    padding: max(18px, env(safe-area-inset-top)) 22px 22px; overflow-y: auto; opacity: 0; transition: opacity .3s;
+}
+.d-screen.on { opacity: 1; }
+.d-screen.d-dim { background: rgba(27, 27, 47, 0.5); align-items: center; justify-content: center; z-index: 35; }
+.d-head { display: flex; align-items: center; gap: 18px; }
+.d-head-small { flex-direction: column; align-items: flex-start; gap: 4px; }
+.d-logo {
+    flex: none; width: 74px; height: 74px; display: grid; place-items: center; text-decoration: none;
+    font: 400 3rem/1 var(--head); color: #e8173b; background: #fff; border: 6px solid #e8173b; border-radius: 14px; box-shadow: 5px 5px 0 var(--ink);
+}
+.d-title { font: 400 clamp(2.6rem, 6vw, 4.4rem)/.9 var(--head); letter-spacing: 2px; margin: 0; color: #fff; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; text-shadow: 5px 5px 0 var(--ink); }
+.d-title span { color: var(--pink); }
+.d-sub { margin: 6px 0 0; font-weight: 600; font-size: 1.15rem; color: #fff; text-shadow: 2px 2px 0 var(--ink); }
+.d-h2 { font: 400 clamp(2rem, 4vw, 2.8rem)/1 var(--head); letter-spacing: 1.5px; margin: 0; color: #fff; -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 4px 4px 0 var(--ink); }
+.d-foot { margin-top: auto; color: #fff; font-weight: 600; text-shadow: 2px 2px 0 var(--ink); }
+.d-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.d-row-center { justify-content: center; }
+.d-col { display: flex; flex-direction: column; gap: 12px; min-width: 260px; }
+.d-card { background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 4px solid var(--ink); border-radius: 24px; box-shadow: 7px 7px 0 var(--ink); padding: 18px 20px; }
+.d-card-center { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: min(620px, 92vw); }
+
+/* tarjetas de modo y de circuito */
+.d-cards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.d-pick {
+    text-align: left; font: inherit; color: var(--ink); cursor: pointer; position: relative;
+    background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+    border: 4px solid var(--ink); border-radius: 22px; box-shadow: 6px 6px 0 var(--ink); padding: 16px 18px 18px;
+    transition: transform .14s, box-shadow .14s, background .14s;
+}
+.d-pick:hover, .d-pick.focus, .d-pick:focus-visible { transform: translateY(-4px) rotate(-1deg); box-shadow: 8px 10px 0 var(--ink); background: #fff; outline: none; }
+.d-pick .em { font-size: 2.6rem; line-height: 1; }
+.d-pick h3 { font: 400 1.7rem/1 var(--head); letter-spacing: 1px; margin: 10px 0 6px; color: var(--pink); -webkit-text-stroke: 1px var(--ink); }
+.d-pick p { margin: 0; font-size: 1rem; line-height: 1.35; }
+.d-pick .tag { position: absolute; top: 12px; right: 12px; font-size: .8rem; font-weight: 700; background: var(--yellow); border: 2px solid var(--ink); border-radius: 10px; padding: 2px 8px; }
+.d-pick .rec { display: block; margin-top: 8px; font-weight: 700; font-size: .95rem; }
+
+/* --- Garaje --------------------------------------------------------------- */
+.d-garage { flex-direction: row; justify-content: space-between; align-items: stretch; pointer-events: none; }
+.d-garage > * { pointer-events: auto; }
+.d-garage-left { display: flex; flex-direction: column; gap: 12px; width: min(250px, 34vw); }
+.d-garage-right { width: min(420px, 46vw); display: flex; flex-direction: column; justify-content: flex-end; }
+.d-carlist { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding: 4px 8px 8px 2px; }
+.d-car {
+    font: 700 1.05rem var(--font); text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px;
+    background: var(--glass-strong); border: 3px solid var(--ink); border-radius: 14px; padding: 8px 12px; box-shadow: 0 4px 0 var(--ink); color: var(--ink);
+}
+.d-car i { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink); flex: none; }
+.d-car.on { background: var(--yellow); transform: translateX(6px); }
+.d-car.focus, .d-car:focus-visible { outline: 4px solid var(--pink); outline-offset: 2px; }
+#g-name { font: 400 2rem/1 var(--head); letter-spacing: 1px; margin: 0; color: var(--pink); -webkit-text-stroke: 1px var(--ink); }
+.d-desc { margin: 4px 0 10px; }
+.d-tune { display: grid; gap: 6px; }
+.d-slider { display: grid; grid-template-columns: 26px 1fr 52px; align-items: center; gap: 8px; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+.d-slider label { grid-column: 1 / -1; font-size: .9rem; margin-bottom: -4px; }
+.d-slider.focus { background: rgba(255, 77, 141, .18); }
+.d-slider.off { opacity: .45; }
+.d-slider input { width: 100%; accent-color: var(--pink); }
+.d-slider output { text-align: right; font-variant-numeric: tabular-nums; }
+.d-colors { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.d-colors button { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--ink); cursor: pointer; padding: 0; }
+.d-colors button.on { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--ink); }
+.d-colors button.focus { outline: 4px solid var(--pink); outline-offset: 3px; }
+.d-stats { display: grid; gap: 4px; margin-top: 6px; }
+.d-stat { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 8px; font-size: .9rem; font-weight: 600; }
+.d-stat div { height: 12px; border: 2px solid var(--ink); border-radius: 8px; background: #fff; overflow: hidden; }
+.d-stat div i { display: block; height: 100%; background: linear-gradient(90deg, var(--yellow), var(--pink)); transition: width .25s; }
+.btn.focus { outline: 4px solid var(--pink); outline-offset: 3px; }
+.d-garage .d-row { flex-wrap: nowrap; }
+.d-garage .d-row .btn { font-size: 1rem; padding: .55em .9em; }
+
+/* --- Resultados ----------------------------------------------------------- */
+.d-results table { border-collapse: collapse; margin: 4px auto; font-size: 1.1rem; }
+.d-results td { padding: 4px 12px; border-bottom: 2px dashed rgba(27, 27, 47, .2); text-align: left; }
+.d-results td.t { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.d-results tr.me td { background: rgba(255, 210, 63, .45); }
+.d-results .big { font: 400 2.2rem var(--head); letter-spacing: 1px; margin: 0; }
+.d-results .stars { font-size: 2.6rem; letter-spacing: 6px; }
+
+/* --- HUD de carrera ------------------------------------------------------- */
+.d-hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; opacity: 0; transition: opacity .3s; }
+.d-hud.on { opacity: 1; }
+.dh-panel { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; }
+.dh-panel.dh-of2 { width: 50%; }
+.dh-panel.dh-p1 { left: 50%; }
+.dh-of2.dh-p0 { border-right: 4px solid var(--ink); }
+.dh-top { position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; flex-wrap: wrap; max-width: calc(100% - 200px); }
+.dh-chip { background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 3px solid var(--ink); border-radius: 14px; box-shadow: 0 4px 0 var(--ink); padding: 3px 12px 5px; text-align: center; }
+.dh-chip span { display: block; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; opacity: .7; }
+.dh-chip b { font: 400 1.55rem/1 var(--head); letter-spacing: 1px; font-variant-numeric: tabular-nums; }
+.dh-chip b.bump { animation: dbump .4s; }
+.dh-who b { color: var(--pink); }
+.dh-title b { font-size: 1.15rem; }
+@keyframes dbump { 40% { transform: scale(1.35); } }
+.dh-dash { position: absolute; right: 14px; bottom: 14px; background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 4px solid var(--ink); border-radius: 20px; box-shadow: 0 5px 0 var(--ink); padding: 6px 16px 10px; text-align: center; min-width: 110px; }
+.dh-kmh { font: 400 2.6rem/1 var(--head); display: block; }
+.dh-dash small { font-weight: 700; }
+.dh-turbo { margin-top: 6px; height: 12px; border: 2px solid var(--ink); border-radius: 8px; background: #fff; overflow: hidden; }
+.dh-turbo i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #7ad7ff, #2f6fe0); }
+.dh-turbo.on i { background: linear-gradient(90deg, #fff, #7ad7ff); }
+.dh-msg { position: absolute; left: 50%; top: 22%; transform: translate(-50%, 0) scale(.8); opacity: 0; transition: opacity .25s, transform .25s; font: 400 1.9rem var(--head); letter-spacing: 1px; color: #fff; -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 3px 3px 0 var(--ink); white-space: nowrap; }
+.dh-msg.on { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.dh-msg[data-kind="bad"] { color: #ffb3c7; }
+.dh-msg[data-kind="ok"] { color: #b6f5c8; }
+.dh-count { position: absolute; left: 50%; top: 38%; transform: translate(-50%, -50%) scale(.4); opacity: 0; font: 400 clamp(6rem, 18vw, 12rem)/1 var(--head); color: var(--yellow); -webkit-text-stroke: 6px var(--ink); paint-order: stroke fill; text-shadow: 8px 8px 0 var(--ink); transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), opacity .2s; }
+.dh-count.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.dh-count.go { color: #2ee87a; }
+.dh-banner { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: opacity .3s, transform .3s; background: var(--yellow); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); padding: 10px 20px; font-weight: 700; font-size: 1.25rem; max-width: 86vw; text-align: center; }
+.dh-banner.on { opacity: 1; transform: translateX(-50%); }
+.dh-mini { position: absolute; right: 14px; top: 14px; width: 150px; height: 150px; border-radius: 18px; background: rgba(255, 250, 240, .45); border: 3px solid var(--ink); box-shadow: 0 4px 0 var(--ink); }
+.d-hud .dh-mini { top: 76px; }
+.dh-help.gone { opacity: 0; }
+.gk-card { position: absolute; left: 50%; top: 74px; transform: translateX(-50%) translateY(-10px); opacity: 0; transition: opacity .3s, transform .3s; max-width: min(640px, 70vw); background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); padding: 10px 18px; text-align: center; }
+.gk-card.on { opacity: 1; transform: translateX(-50%); }
+.gk-card b { font: 400 1.5rem var(--head); letter-spacing: 1px; color: var(--pink); -webkit-text-stroke: 1px var(--ink); }
+.gk-card p { margin: 4px 0 0; font-size: 1.05rem; font-weight: 600; }
+.dh-help { transition: opacity .6s; position: absolute; left: 14px; bottom: 14px; max-width: min(62vw, 760px); background: var(--glass-strong); border: 3px solid var(--ink); border-radius: 14px; padding: 6px 12px; font-size: .9rem; }
+
+@media (max-width: 760px) {
+    .d-garage { flex-direction: column; }
+    .d-garage-left, .d-garage-right { width: 100%; }
+    .d-carlist { flex-direction: row; overflow-x: auto; }
+    .dh-help { display: none; }
+    .dh-mini { width: 110px; height: 110px; }
+}

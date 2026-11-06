@@ -33,9 +33,49 @@ DGT driving theory test.
 
 ![The proposal](docs/screenshots/proposal.webp)
 
+## Bonus: the driving mode
+
+The gamepad exam was the part everybody wanted to replay, so it grew into a game of its own. Open it from the
+**🏁 Conducir** button on the title screen, or go straight to `drive.html`. It feels a bit like Micro Machines:
+toy cars racing over giant everyday things.
+
+| | |
+|---|---|
+| ![Garage with live tuning](docs/screenshots/drive-garage.webp) | ![Race on the breakfast table](docs/screenshots/drive-race.webp) |
+| ![Split-screen versus on the desk](docs/screenshots/drive-versus.webp) | ![Low-gravity Mars](docs/screenshots/drive-marte.webp) |
+
+- **Garage.**
+  - Eight cars: the Model 3 plus seven Kenney vehicles.
+  - Live tuning of wheel size, track width, suspension height, length and paint.
+  - The Kenney models have separate wheels, so big wheels and a lifted body produce a real monster truck.
+  - Every change also feeds the physics (top speed, acceleration, grip, turning, ground clearance), shown as stat
+    bars.
+  - Paint is found automatically: the palette textures have baked shading, so the body is detected by clustering
+    hues and those triangles are split into their own material.
+- **Four circuits.**
+  - **Breakfast table:** cereal-lined track, slippery jam and milk, a toast ramp, and an edge you can fall off.
+  - **Desk:** a pencil-drawn track around a laptop, with ink spills and pencils as guard rails.
+  - **Garden:** a dirt path, puddles and mud, a garden-hose barrier, and a snail that will not yield.
+  - **Mars:** 38 % gravity, so every crater rim becomes a long jump.
+- **Modes.**
+  - **Time trial:** a ghost of your best lap is stored in the browser.
+  - **Race:** three AI rivals.
+  - **Two-player split screen:** Micro Machines rules. Pull more than 40 m ahead, or make the other car fall off,
+    and you score a point; first to 5 wins.
+  - **Gymkhana:** slalom, bay parking, parallel parking, reversing into a garage and a precision stop, scored with
+    stars.
+  - **Driving exam:** the original exam, now with the car of your choice.
+- **Under the hood.**
+  - Arcade physics with lateral grip, which gives drifts, handbrake and boost.
+  - Jumps under per-map gravity, and circle/box/segment collisions with a spatial grid.
+  - Low obstacles split into bumps (everybody drives over them) and steps (only cars with enough clearance climb
+    them).
+  - Physics runs in sub-steps, so it stays stable on slow devices.
+  - Menus can be navigated with the gamepad, and every car has its own shadow and skid marks.
+
 ## Engineering highlights
 
-- **No build step.** About 13k lines of plain JavaScript in native ES modules. Three.js r160 loads through an
+- **No build step.** About 16k lines of plain JavaScript in native ES modules. Three.js r160 loads through an
   import map, so any static host can serve it.
 - **Data-driven procedural world.**
   - The road is generated from an itinerary (`data/places.js`). Cars drive in the right lane.
@@ -87,10 +127,17 @@ Then open <http://localhost:8000>. Useful URL parameters:
 | `?debug=1` | FPS and draw-call counter |
 | `?classic=1` | 2D version |
 | `?fast=1`, `?timescale=0.5` | Speed animations up, or slow the camera down |
+| `drive.html?mode=race&map=marte&car=suv` | Driving mode, skipping the menus. Modes: `time`, `race`, `versus`, `gymkhana`, `exam`. Maps: `desayuno`, `escritorio`, `jardin`, `marte` |
+| `drive.html?…&autopilot=1` | The AI drives your car (handy for testing and as a demo) |
 
 Exam controls: on a gamepad, **RT** accelerates, **LT** brakes or reverses, the **left stick** steers,
 **LB/RB** work the indicators and **A** confirms. On a keyboard: arrow keys or **WASD**, **Q/E** for the
 indicators and **Enter** to confirm.
+
+Driving-mode controls: **RT/LT** accelerate and brake, **B** handbrake, **A** boost, **Y** back to the track and
+**Start** pause. On a keyboard: **WASD** or the arrow keys, **Space** handbrake, **Shift** boost, **R** back to the
+track and **Esc** pause. In two-player mode each player has their own gamepad, or their own half of the keyboard
+(WASD for player 1, the arrow keys for player 2).
 
 ## Deploy
 
@@ -112,6 +159,7 @@ characters. See [CUSTOMIZE.md](CUSTOMIZE.md).
 ```
 index.html            3D game (Three.js)       classic.html   2D fallback
 game/                 engine, world, track, dioramas, camera, exam, finale, UI
+drive.html, game/drive/   driving mode: cars & tuning, vehicle physics, circuits, AI, ghost, modes, menus
 data/places.js        the itinerary (one diorama per place)
 questions.json        theory questions          data/practical-questions.js   in-car questions
 sfx.js                generative music and sound effects

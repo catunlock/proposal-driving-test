@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Autoescuela Cari · Conducir</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Caveat:wght@700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="game/game.css">
+    <link rel="stylesheet" href="game/drive/drive.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body class="drive">
+    <canvas id="scene"></canvas>
+
+    <!-- Carga -->
+    <div id="d-loading" class="overlay on">
+        <div class="loading-box">
+            <div class="loading-car">🏁🚗💨</div>
+            <p id="d-loading-text">Preparando el garaje…</p>
+            <div class="bar"><div id="d-loading-bar"></div></div>
+        </div>
+    </div>
+
+    <!-- 1 · Modo de juego -->
+    <section id="m-home" class="d-screen" hidden>
+        <header class="d-head">
+            <a class="d-logo nav" href="index.html" title="Volver a la portada">L</a>
+            <div>
+                <h1 class="d-title">Autoescuela <span>Cari</span></h1>
+                <p class="d-sub">Modo conducción · elige cómo quieres jugar</p>
+            </div>
+        </header>
+        <div id="m-modes" class="d-cards d-modes"></div>
+        <footer class="d-foot"><span id="m-pad-hint"></span></footer>
+    </section>
+
+    <!-- 2 · Garaje -->
+    <section id="m-garage" class="d-screen d-garage" hidden>
+        <div class="d-garage-left">
+            <h2 id="g-title" class="d-h2">Garaje</h2>
+            <div id="g-cars" class="d-carlist"></div>
+        </div>
+        <div class="d-garage-right">
+            <div class="d-card">
+                <h3 id="g-name">Tesla</h3>
+                <p id="g-desc" class="d-desc"></p>
+                <div id="g-tune" class="d-tune"></div>
+                <div id="g-colors" class="d-colors"></div>
+                <div id="g-stats" class="d-stats"></div>
+                <div class="d-row">
+                    <button id="g-back" class="btn btn-ghost nav" data-back>◀ Atrás</button>
+                    <button id="g-reset" class="btn btn-ghost nav">↺ De serie</button>
+                    <button id="g-ok" class="btn nav" data-primary>Listo ▶</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3 · Circuito -->
+    <section id="m-maps" class="d-screen" hidden>
+        <header class="d-head d-head-small">
+            <h2 class="d-h2">Elige el circuito</h2>
+            <p id="m-maps-sub" class="d-sub"></p>
+        </header>
+        <div id="m-maplist" class="d-cards d-maps"></div>
+        <div class="d-row d-row-center">
+            <button class="btn btn-ghost nav" data-back id="m-maps-back">◀ Atrás</button>
+        </div>
+    </section>
+
+    <!-- Pausa -->
+    <section id="m-pause" class="d-screen d-dim" hidden>
+        <div class="d-card d-card-center">
+            <h2 class="d-h2">Pausa</h2>
+            <div class="d-col">
+                <button id="p-resume" class="btn nav" data-primary>▶ Continuar</button>
+                <button id="p-restart" class="btn btn-ghost nav">↺ Reiniciar</button>
+                <button id="p-garage" class="btn btn-ghost nav">🛠️ Cambiar de coche</button>
+                <button id="p-menu" class="btn btn-ghost nav" data-back>🏠 Menú</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resultados -->
+    <section id="m-results" class="d-screen d-dim" hidden>
+        <div class="d-card d-card-center d-results">
+            <h2 id="r-title" class="d-h2">¡Meta!</h2>
+            <div id="r-body"></div>
+            <div class="d-row d-row-center">
+                <button id="r-again" class="btn nav" data-primary>↺ Otra vez</button>
+                <button id="r-maps" class="btn btn-ghost nav">🗺️ Otro circuito</button>
+                <button id="r-menu" class="btn btn-ghost nav" data-back>🏠 Menú</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- HUD de carrera -->
+    <div id="d-hud" class="d-hud" hidden></div>
+
+    <!-- Examen (mismas piezas que en el juego) -->
+    <section id="exam-hud" class="exam-hud" hidden>
+        <div class="ex-examiner">
+            <span class="ex-avatar">👨‍🏫</span>
+            <div><b>Examinador</b><p id="ex-say"></p></div>
+        </div>
+        <div id="ex-flash" class="ex-flash"></div>
+        <div class="ex-score">
+            <div class="ex-chip"><span>Faltas</span><b id="ex-faults">0</b></div>
+            <div class="ex-chip ex-chip-grave" hidden><span>Repetidas</span><b id="ex-graves">0</b></div>
+        </div>
+        <div class="ex-dash">
+            <span id="ex-blink-l" class="ex-blink">◀</span>
+            <div class="ex-speed"><b id="ex-kmh">0</b><small>km/h</small></div>
+            <span id="ex-limit" class="ex-limit">50</span>
+            <span id="ex-blink-r" class="ex-blink">▶</span>
+        </div>
+        <div id="ex-pad" class="ex-pad"></div>
+    </section>
+
+    <button type="button" id="sfx-toggle" class="sfx-toggle" aria-label="Sonido" title="Sonido">🔊</button>
+    <div id="fader" class="fader" hidden></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script src="sfx.js"></script>
+    <script type="module" src="game/drive/main.js"></script>
+</body>
+</html>

@@ -109,3 +109,32 @@ When `GAME_PASSWORD` is set on Vercel, `middleware.js` keeps the whole site behi
 Everything is in `sfx.js`. The music is generated live (music box, pads and reverb in F major) in several moods
 (`day`, `sunset`, `road`, `night`, `space`, `suspense`, `love`, `celebrate`, …). It also adds ambience: waves and
 birds by day, crickets at night, and the electric hum of the car following its speed.
+
+## Driving mode (`drive.html`, `game/drive/`)
+
+| File | What it holds |
+|---|---|
+| `cars.js` | The garage: `CARS` (name, model, mass, power, top speed, grip), `TUNING` ranges, `COLORS`, `physicsFor()` (how each tuning value changes the physics) and `statsFor()` (the bars) |
+| `vehicle.js` | Arcade physics: throttle and brakes, lateral grip and drift, handbrake, boost, jumps, collisions, suspension and wheels |
+| `circuit.js` | Circuit building blocks: closed spline track, road ribbon, start line, obstacles, bumps and steps, ramps, platforms, hazards, boost pads, falling off the edge, and lap counting (`Lapper`) |
+| `maps/*.js` | One file per circuit (`desayuno`, `escritorio`, `jardin`, `marte`); list them in `maps/index.js` |
+| `session.js` | Time trial, race against the AI and two-player versus (`GAP` and `POINTS` set the Micro Machines rule) |
+| `gymkhana.js` | The five gymkhana tests, their star thresholds and the floor markings |
+| `exam-mode.js` | The original exam (`game/exam.js`) driven with the tuned car |
+| `ai.js`, `ghost.js`, `camera.js`, `hud.js`, `input.js` | Rivals, the time-trial ghost, the chase camera, the HUD and the gamepad and keyboard input |
+
+To add a circuit, copy one of the map files and change it:
+
+- **The track:** `C.track(points, { width })`, a closed loop of `[x, z]` points.
+- **Scenery:** add it with `C.add()` or `C.prop('kenney/model', x, z, { size })`.
+- **Solid obstacles:** register them with `C.circle()`, `C.box()` or `C.wall()`.
+  - `{ h, bump: true }` makes a low bump that every car drives over.
+  - A small `h` without `bump` makes a step that only high-clearance cars can climb.
+- **Jumps and surfaces:**
+  - `C.ramp()` and `C.platform()`/`C.disc()` give jumps and raised ground.
+  - `C.hazard({ x, z, r }, surface)` adds slippery or slow patches.
+  - `C.boost()` adds a boost pad.
+- **Falling off:** `C.voidFn = (x, z) => …` decides where cars fall off the map.
+- **Finish:** call `C.finalize()` at the end.
+
+Records are kept in the browser's `localStorage` (`drive.ghost.v1.*`, `drive.gym.v1`, `drive.car.v1`).

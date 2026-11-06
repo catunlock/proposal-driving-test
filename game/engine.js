@@ -128,7 +128,8 @@ export class Engine {
             this.renderer.info.reset();
             this.time += dt;
             for (const fn of this.updaters) fn(dt, this.time);
-            if (this.composer) this.composer.render(dt);
+            if (this.renderHook) this.renderHook(dt);           // pantalla partida (modo conducción a dos)
+            else if (this.composer) this.composer.render(dt);
             else this.renderer.render(this.scene, this.camera);
 
             // Medidor de FPS y paso automático a modo ligero si va lento

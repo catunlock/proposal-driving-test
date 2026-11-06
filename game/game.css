@@ -395,3 +395,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #5ec4ff; col
 .prompt.compact.on { transform: none; }
 .prompt.compact #prompt-text { font-size: 1rem; margin: 0 0 8px; }
 .prompt.compact .btn-big { font-size: 1.15rem; padding: 0.55em 1.2em; }
+
+/* Portada: START + acceso al modo conducción */
+.title-actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.title-actions .btn { text-decoration: none; display: inline-block; }
