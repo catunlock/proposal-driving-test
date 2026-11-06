@@ -28,7 +28,10 @@ const MODES = [
 
 // ---------------------------------------------------------------- estado
 const app = {};
-const S = { mode: null, players: [loadConfig('p1'), loadConfig('p2')], editing: 0, map: null, session: null, screen: null };
+const S = { mode: null, players: [loadConfig('p1'), loadConfig('p2')], editing: 0, map: null, session: null, screen: null, items: true };
+try { S.items = localStorage.getItem('drive.items') !== '0'; } catch (e) { /* */ }
+// música de los menús (jazz-funk alegre, sfx.js · 'menu')
+const menuMusic = () => sfx('music', 'menu');
 
 function show(el) { el.hidden = false; requestAnimationFrame(() => el.classList.add('on')); }
 function hide(el) { el.classList.remove('on'); setTimeout(() => { if (!el.classList.contains('on')) el.hidden = true; }, 300); }
@@ -153,6 +156,7 @@ function homeScreen() {
     const pads = app.controls.pads().length;
     $('m-pad-hint').textContent = pads ? `🎮 ${pads} mando${pads > 1 ? 's' : ''} conectado${pads > 1 ? 's' : ''} · cruceta para moverte, A para elegir, B para volver` : '🎮 ¿Mando? Conéctalo y pulsa cualquier botón · ⌨️ también se juega con el teclado';
     enterGarage();
+    menuMusic();
     screen('m-home');
 }
 
@@ -200,6 +204,7 @@ function garageScreen() {
         mapsScreen();
     };
     enterGarage();
+    menuMusic();
     garageCar(cfg);
     if (S.screen !== $('m-garage')) screen('m-garage');
 }
@@ -214,6 +219,13 @@ function renderStats(cfg, dims) {
 function mapsScreen() {
     const box = $('m-maplist'); box.innerHTML = '';
     $('m-maps-sub').textContent = `${S.mode.emoji} ${S.mode.name}`;
+    // objetos (solo carrera y pique a dos)
+    const tg = $('m-items');
+    tg.hidden = !(S.mode.id === 'race' || S.mode.id === 'versus');
+    const paint = () => { tg.textContent = `🎁 Objetos: ${S.items ? 'sí' : 'no'}`; tg.classList.toggle('btn-ghost', !S.items); };
+    tg.onclick = () => { S.items = !S.items; try { localStorage.setItem('drive.items', S.items ? '1' : '0'); } catch (e) { /* */ } sfx('click'); paint(); };
+    paint();
+    menuMusic();
     for (const M of MAPS) {
         const g = loadGhost(M.id);
         const b = document.createElement('button');
@@ -235,7 +247,7 @@ async function play(special = null) {
     let session;
     if (special === 'gymkhana') { const { GymkhanaSession } = await import('./gymkhana.js'); session = new GymkhanaSession(app, { players: S.players }); }
     else if (special === 'exam') { const { ExamSession } = await import('./exam-mode.js'); session = new ExamSession(app, { players: S.players }); }
-    else session = new RaceSession(app, { map: S.map, mode: S.mode.id, players: S.players, autopilot: params.has('autopilot'), laps: params.get('laps') ? +params.get('laps') : undefined });
+    else session = new RaceSession(app, { map: S.map, mode: S.mode.id, players: S.players, items: S.items && params.get('items') !== '0', autopilot: params.has('autopilot'), laps: params.get('laps') ? +params.get('laps') : undefined });
     S.session = session;
     try { await session.load(); }
     catch (e) { console.error(e); loading(false); homeScreen(); return; }
@@ -278,6 +290,7 @@ function resultsScreen(r) {
         html = `<p class="big">${r.points[0]} – ${r.points[1]}</p><p>¿La revancha?</p>`;
     } else if (r.html) { title = r.title; html = r.html; }
     $('r-title').textContent = title;
+    menuMusic();
     body.innerHTML = html;
     $('r-again').onclick = () => { screen(null); replay(); };
     $('r-maps').hidden = !!S.mode.special;
@@ -307,6 +320,9 @@ async function boot() {
     mute.onclick = () => { if (window.sfx) window.sfx.setMuted(!window.sfx.isMuted()); icon(); };
     icon();
     addEventListener('gamepadconnected', () => { if (S.screen === $('m-home')) homeScreen(); });
+    // el navegador solo deja sonar el audio tras un gesto: al primero, arranca la música del menú
+    const unlock = () => { if (S.screen && S.screen.id !== 'm-pause') menuMusic(); removeEventListener('pointerdown', unlock); removeEventListener('keydown', unlock); };
+    addEventListener('pointerdown', unlock); addEventListener('keydown', unlock);
     // atajos de prueba
     const mode = MODES.find(m => m.id === params.get('mode'));
     if (params.get('car')) S.players[0] = defaultConfig(params.get('car'));

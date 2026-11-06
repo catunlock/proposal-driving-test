@@ -2,19 +2,19 @@
 //  MANDOS: Gamepad API (mapeo estándar) + teclado, para uno o dos jugadores
 // ============================================================================
 //   Mando:   RT acelerar · LT frenar / atrás · stick izquierdo (o cruceta) girar ·
-//            A turbo · B freno de mano · Y volver a la pista · X claxon · Start pausa
+//            A turbo · B freno de mano · X o LB objeto · Y volver a la pista · R3 claxon · Start pausa
 //   Teclado (jugador 1 o en solitario): W A S D o flechas · Espacio freno de mano · Mayús turbo ·
-//            R volver a la pista · H claxon · Esc pausa
-//   Dos jugadores: J1 = W A S D + Espacio (freno) + Mayús izq. (turbo) + R, o el 1er mando
-//                  J2 = flechas + Ctrl dcho. (freno) + Mayús dcha. (turbo) + Retroceso, o el 2º mando
+//            E objeto · R volver a la pista · H claxon · Esc pausa
+//   Dos jugadores: J1 = W A S D + Espacio (freno) + Mayús izq. (turbo) + E (objeto) + R, o el 1er mando
+//                  J2 = flechas + Ctrl dcho. (freno) + Mayús dcha. (turbo) + «.» (objeto) + Retroceso, o el 2º mando
 import * as THREE from 'three';
 
 const dz = (v, t = 0.14) => Math.abs(v) < t ? 0 : (v - Math.sign(v) * t) / (1 - t);
 
 const SCHEMES = {
-    any: { up: ['KeyW', 'ArrowUp'], down: ['KeyS', 'ArrowDown'], left: ['KeyA', 'ArrowLeft'], right: ['KeyD', 'ArrowRight'], hb: ['Space'], turbo: ['ShiftLeft', 'ShiftRight'], reset: ['KeyR'], horn: ['KeyH'] },
-    p1: { up: ['KeyW'], down: ['KeyS'], left: ['KeyA'], right: ['KeyD'], hb: ['Space'], turbo: ['ShiftLeft'], reset: ['KeyR'], horn: ['KeyH'] },
-    p2: { up: ['ArrowUp'], down: ['ArrowDown'], left: ['ArrowLeft'], right: ['ArrowRight'], hb: ['ControlRight', 'Enter'], turbo: ['ShiftRight'], reset: ['Backspace'], horn: ['KeyL'] }
+    any: { up: ['KeyW', 'ArrowUp'], down: ['KeyS', 'ArrowDown'], left: ['KeyA', 'ArrowLeft'], right: ['KeyD', 'ArrowRight'], hb: ['Space'], turbo: ['ShiftLeft', 'ShiftRight'], item: ['KeyE', 'KeyF'], reset: ['KeyR'], horn: ['KeyH'] },
+    p1: { up: ['KeyW'], down: ['KeyS'], left: ['KeyA'], right: ['KeyD'], hb: ['Space'], turbo: ['ShiftLeft'], item: ['KeyE'], reset: ['KeyR'], horn: ['KeyH'] },
+    p2: { up: ['ArrowUp'], down: ['ArrowDown'], left: ['ArrowLeft'], right: ['ArrowRight'], hb: ['ControlRight', 'Enter'], turbo: ['ShiftRight'], item: ['Period', 'Numpad0', 'Slash'], reset: ['Backspace'], horn: ['KeyL'] }
 };
 
 export class Controls {
@@ -55,13 +55,14 @@ export class Controls {
             hb: B(1) > 0.5 || key(K.hb),
             turbo: B(0) > 0.5 || key(K.turbo),
             reset: B(3) > 0.5 || key(K.reset),
-            horn: B(2) > 0.5 || key(K.horn),
+            item: B(2) > 0.5 || B(4) > 0.5 || key(K.item),
+            horn: B(11) > 0.5 || key(K.horn),
             pause: B(9) > 0.5 || (slot !== 'p2' && key(['Escape', 'KeyP'])),
             pad: pads.length > 0
         };
         // flancos de subida
         s.pressed = {};
-        for (const n of ['reset', 'horn', 'pause', 'turbo', 'hb']) {
+        for (const n of ['reset', 'horn', 'pause', 'turbo', 'hb', 'item']) {
             const id = slot + ':' + n;
             s.pressed[n] = s[n] && !this.prev.get(id);
             this.prev.set(id, s[n]);

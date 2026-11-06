@@ -129,3 +129,21 @@ body.drive { background: #1b1b2f; }
     .dh-help { display: none; }
     .dh-mini { width: 110px; height: 110px; }
 }
+
+/* --- Objetos: ranura con ruleta y destello del rayo --------------------------- */
+.dh-item { position: absolute; left: 50%; top: 84px; transform: translateX(-50%); width: 78px; height: 78px; display: grid; place-items: center; background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 4px solid var(--ink); border-radius: 20px; box-shadow: 0 5px 0 var(--ink); }
+.dh-item span { font-size: 2.7rem; line-height: 1; }
+.dh-item small { position: absolute; bottom: -12px; right: -12px; min-width: 26px; height: 26px; display: grid; place-items: center; font: 400 1.1rem var(--head); background: var(--yellow); border: 3px solid var(--ink); border-radius: 50%; }
+.dh-item small:empty { display: none; }
+.dh-item.roll { background: linear-gradient(135deg, #ffd23f, #ff4d8d, #7ad7ff, #2ee87a); background-size: 300% 300%; animation: droll .5s linear infinite; }
+.dh-item.has { background: #fff; }
+.dh-item.pop span { animation: dpop .35s cubic-bezier(.34, 1.56, .64, 1); }
+@keyframes droll { to { background-position: 100% 100%; } }
+@keyframes dpop { from { transform: scale(.3); } }
+.dh-of2 .dh-item { top: 84px; width: 64px; height: 64px; }
+.dh-of2 .dh-item span { font-size: 2.1rem; }
+.dh-flash { position: absolute; inset: 0; background: #fffbe0; opacity: 0; pointer-events: none; }
+.dh-flash.on { animation: dflash .5s ease-out; }
+@keyframes dflash { 0% { opacity: .9; } 100% { opacity: 0; } }
+#m-items { margin-top: 8px; }
+.dh-item:not(.has):not(.roll) { opacity: .5; transform: translateX(-50%) scale(.8); }

@@ -175,19 +175,20 @@ export function boostPad(w, d) {
     const c = document.createElement('canvas'); c.width = 128; c.height = 256;
     const g = c.getContext('2d');
     // fondo translúcido con borde y tres flechas gruesas que brillan
-    g.fillStyle = 'rgba(47,111,224,0.35)'; g.fillRect(0, 0, 128, 256);
-    g.strokeStyle = '#ffffff'; g.lineWidth = 8; g.strokeRect(4, 4, 120, 248);
+    g.fillStyle = 'rgba(29,79,191,0.55)'; g.fillRect(0, 0, 128, 256);
+    g.strokeStyle = '#ffd23f'; g.lineWidth = 8; g.strokeRect(4, 4, 120, 248);
     g.lineJoin = 'round';
     for (let k = 0; k < 3; k++) {
         const y = 52 + k * 72;
         g.beginPath(); g.moveTo(64, y - 36); g.lineTo(118, y + 18); g.lineTo(90, y + 18); g.lineTo(64, y - 8); g.lineTo(38, y + 18); g.lineTo(10, y + 18); g.closePath();
-        g.fillStyle = '#7ad7ff'; g.fill(); g.lineWidth = 5; g.strokeStyle = '#ffffff'; g.stroke();
+        g.fillStyle = '#3fb4ff'; g.fill(); g.lineWidth = 5; g.strokeStyle = '#1b1b2f'; g.stroke();
     }
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;           // las flechas avanzan (se desplaza la textura)
     const geo = new THREE.PlaneGeometry(w, d); geo.rotateX(-Math.PI / 2);
     // las flechas apuntan hacia +z local (sentido de la marcha si se gira con el rumbo de la pista)
     geo.rotateY(Math.PI);
-    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: t, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -4, transparent: true, opacity: 0.95 }));
+    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: t, polygonOffset: true, polygonOffsetFactor: -4, transparent: true, opacity: 0.95 }));
     m.userData.tex = t;
     return m;
 }

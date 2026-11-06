@@ -21,7 +21,7 @@ export class HUD {
         root.append(this.count, this.mini, this.help, this.banner);
     }
     // n paneles (1 o 2); fields: qué chips mostrar
-    setup(n, { lap = true, pos = false, best = true, points = false, title = '', extra = [] } = {}) {
+    setup(n, { lap = true, pos = false, best = true, points = false, title = '', extra = [], items = false } = {}) {
         this.panels.forEach(p => p.box.remove());
         this.panels = [];
         for (let i = 0; i < n; i++) {
@@ -41,6 +41,7 @@ export class HUD {
             P.kmh = dash.querySelector('.dh-kmh'); P.turbo = dash.querySelector('.dh-turbo i');
             P.msg = el('div', 'dh-msg');
             box.append(top, dash, P.msg);
+            if (items) { P.item = el('div', 'dh-item', '<span></span><small></small>'); box.append(P.item); }
             this.root.append(box);
             this.panels.push(P);
         }
@@ -60,6 +61,22 @@ export class HUD {
         if (P.kmh.textContent !== k) P.kmh.textContent = k;
         P.turbo.style.width = Math.round(v.turbo * 100) + '%';
         P.turbo.parentElement.classList.toggle('on', v.boostT > 0);
+    }
+    // Ranura del objeto: emoji (o nada), con ruleta mientras gira
+    item(i, emoji, rolling, hint = '') {
+        const P = this.panels[i]; if (!P || !P.item) return;
+        const sp = P.item.firstChild, k = (emoji || '') + (rolling ? '~' : '');
+        if (P._it === k) return;
+        P._it = k;
+        sp.textContent = emoji || '';
+        P.item.classList.toggle('has', !!emoji && !rolling);
+        P.item.classList.toggle('roll', !!rolling);
+        P.item.lastChild.textContent = emoji && !rolling ? (hint || this.itemHint || '') : '';
+        if (emoji && !rolling) { P.item.classList.remove('pop'); void P.item.offsetWidth; P.item.classList.add('pop'); }
+    }
+    flash() {
+        if (!this.flashEl) { this.flashEl = el('div', 'dh-flash'); this.root.append(this.flashEl); }
+        this.flashEl.classList.remove('on'); void this.flashEl.offsetWidth; this.flashEl.classList.add('on');
     }
     msg(i, text, kind = 'info', ms = 1800) {
         const P = this.panels[i]; if (!P) return;

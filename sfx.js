@@ -6,7 +6,8 @@
 //  API:
 //    sfx.click() sfx.tap() sfx.good() sfx.bad() sfx.next() sfx.start()
 //    sfx.pop() sfx.bloom() sfx.arrive() sfx.fanfare() sfx.firework() sfx.shimmer() sfx.honk()
-//    sfx.music('day' | 'sunset' | 'road' | 'night' | 'romance' | 'wedding' | 'waltz' | 'space' | 'suspense' | 'love' | 'celebrate' | null)
+//    sfx.music('day' | 'sunset' | 'road' | 'night' | 'romance' | 'wedding' | 'waltz' | 'space' | 'suspense' | 'love' | 'celebrate' | 'menu' | null)
+//    sfx.itemBox() sfx.roulette() sfx.itemGet() sfx.throwItem() sfx.drop() sfx.spinOut() sfx.zap() sfx.starPower()   (objetos del modo conducción)
 //    sfx.ambience('day' | 'night' | null)
 //    sfx.engine(0..1)      zumbido eléctrico + rodadura según la velocidad
 //    sfx.isMuted() sfx.setMuted(bool)
@@ -16,7 +17,7 @@
     let muted = false;
     try { muted = localStorage.getItem('sfx-muted') === '1'; } catch (e) { /* ignorar */ }
 
-    let master, comp, sfxBus, musicBus, ambBus, reverb, reverbSend, noiseBuffer;
+    let master, comp, sfxBus, musicBus, musicDry, ambBus, reverb, reverbSend, noiseBuffer;
 
     const midi = n => 440 * Math.pow(2, (n - 69) / 12);
     const MASTER = 1.6;
@@ -39,6 +40,8 @@
 
         sfxBus = bus(0.8, 0.35);
         musicBus = bus(0.0, 0.5);
+        // música sin reverb (bajo y batería del tema de los menús): sigue los mismos fundidos que musicBus
+        musicDry = ctx.createGain(); musicDry.gain.value = 0; musicDry.connect(master);
         ambBus = bus(0.55, 0.1);
 
         noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
@@ -246,18 +249,18 @@
     }
 
     // Batería electrónica suave
-    function kick(t, vol = 0.3) {
+    function kick(t, vol = 0.3, out = musicBus) {
         const o = ctx.createOscillator(); o.type = 'sine';
         o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.13);
         const g = ctx.createGain(); env(g, t, vol, 0.003, 0.32);
-        o.connect(g).connect(musicBus); o.start(t); o.stop(t + 0.35);
+        o.connect(g).connect(out); o.start(t); o.stop(t + 0.35);
     }
-    function snare(t, vol = 0.06) {
-        noise(t, 0.18, { vol, type: 'bandpass', f0: 1800, q: 0.6, out: musicBus, attack: 0.002 });
+    function snare(t, vol = 0.06, out = musicBus) {
+        noise(t, 0.18, { vol, type: 'bandpass', f0: 1800, q: 0.6, out, attack: 0.002 });
         const o = ctx.createOscillator(); o.type = 'triangle';
         o.frequency.setValueAtTime(220, t); o.frequency.exponentialRampToValueAtTime(150, t + 0.08);
         const g = ctx.createGain(); env(g, t, vol * 0.9, 0.002, 0.1);
-        o.connect(g).connect(musicBus); o.start(t); o.stop(t + 0.12);
+        o.connect(g).connect(out); o.start(t); o.stop(t + 0.12);
     }
 
     // Voz solista de sintetizador con vibrato tardío y eco
@@ -521,6 +524,120 @@
         }
     }
 
+    // Menús del modo conducción · jazz-funk alegre y con swing (al estilo de los menús de carreras de karts)
+    // Vuelta de jazz en Do: Cmaj7 · A7 · Dm7 · G7 · Em7 · A7 · Dm7 G7 · Cmaj7
+    function rhodes(t, notes, dur, vol = 0.03) {
+        const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 2600;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol, t + 0.006);
+        g.gain.exponentialRampToValueAtTime(vol * 0.35, t + 0.25);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        // trémolo suave, como un piano eléctrico
+        const lfo = ctx.createOscillator(); lfo.frequency.value = 5.5;
+        const lg = ctx.createGain(); lg.gain.value = 0.25; lfo.connect(lg);
+        const tg = ctx.createGain(); tg.gain.value = 0.85; lg.connect(tg.gain);
+        f.connect(g).connect(tg); pan(tg, 0.15).connect(musicBus);
+        notes.forEach(n => {
+            const fr = midi(n);
+            [[1, 1, 'sine'], [2, 0.18, 'sine'], [4, 0.05, 'triangle']].forEach(([k, a, type]) => {
+                const o = ctx.createOscillator(); o.type = type; o.frequency.value = fr * k;
+                const og = ctx.createGain(); og.gain.value = a;
+                o.connect(og).connect(f); o.start(t); o.stop(t + dur + 0.05);
+            });
+        });
+        lfo.start(t); lfo.stop(t + dur + 0.05);
+    }
+    function funkBass(t, n, dur, vol = 0.085, pop = false) {
+        const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.Q.value = pop ? 6 : 3;
+        f.frequency.setValueAtTime(pop ? 2600 : 1400, t); f.frequency.exponentialRampToValueAtTime(220, t + dur);
+        const g = ctx.createGain(); env(g, t, pop ? vol * 0.8 : vol, 0.003, dur + 0.03);
+        f.connect(g).connect(musicDry);
+        [['square', 0, 0.55], ['sine', 0, 1.2]].forEach(([type, det, a]) => {
+            const o = ctx.createOscillator(); o.type = type; o.frequency.value = midi(n); o.detune.value = det;
+            const og = ctx.createGain(); og.gain.value = a;
+            o.connect(og).connect(f); o.start(t); o.stop(t + dur + 0.08);
+        });
+        if (pop) noise(t, 0.03, { vol: 0.03, type: 'highpass', f0: 3000, out: musicDry, attack: 0.001 });
+    }
+    function brass(t, notes, dur, vol = 0.022) {
+        const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.Q.value = 1.5;
+        f.frequency.setValueAtTime(600, t); f.frequency.exponentialRampToValueAtTime(3200, t + 0.06); f.frequency.exponentialRampToValueAtTime(1200, t + dur);
+        const g = ctx.createGain(); env(g, t, vol, 0.02, dur + 0.08);
+        f.connect(g); pan(g, -0.2).connect(musicBus);
+        notes.forEach(n => [-7, 7].forEach(det => {
+            const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = midi(n); o.detune.value = det;
+            o.connect(f); o.start(t); o.stop(t + dur + 0.12);
+        }));
+    }
+    function hat(t, vol = 0.014, open = false) { noise(t, open ? 0.22 : 0.045, { vol, type: 'highpass', f0: open ? 6500 : 8000, out: musicDry, attack: 0.002 }); }
+    function whistle(t, n, dur, vol = 0.04) {
+        const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 3400;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol, t + 0.015);
+        g.gain.setValueAtTime(vol * 0.8, t + Math.max(0.03, dur - 0.04));
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.12);
+        const lfo = ctx.createOscillator(); lfo.frequency.value = 6;
+        const lg = ctx.createGain(); lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(14, t + Math.min(0.35, dur)); lfo.connect(lg);
+        f.connect(g);
+        const out = pan(g, -0.05); out.connect(musicBus); sendEcho(out, 0.22);
+        [['square', 0, 0.35], ['triangle', 0, 0.8], ['triangle', 1200, 0.25]].forEach(([type, det, a]) => {
+            const o = ctx.createOscillator(); o.type = type; o.frequency.value = midi(n); o.detune.value = det;
+            lg.connect(o.detune);
+            const og = ctx.createGain(); og.gain.value = a;
+            o.connect(og).connect(f); o.start(t); o.stop(t + dur + 0.15);
+        });
+        lfo.start(t); lfo.stop(t + dur + 0.15);
+    }
+    const MENU = [
+        { root: 36, keys: [64, 67, 71, 74], mel: [[0, 76, 0.5], [0.5, 79, 0.5], [1, 81, 0.75], [2, 79, 0.5], [2.5, 76, 0.5], [3, 74, 0.5], [3.5, 76, 0.5]] },       // Cmaj7
+        { root: 33, keys: [61, 64, 67, 69], mel: [[0, 73, 0.5], [0.5, 76, 0.5], [1, 79, 1], [2.5, 81, 0.5], [3, 79, 1]] },                                       // A7
+        { root: 38, keys: [62, 65, 69, 72], mel: [[0, 77, 0.5], [0.5, 76, 0.5], [1, 74, 0.5], [1.5, 72, 0.5], [2, 74, 1], [3.5, 77, 0.5]] },                     // Dm7
+        { root: 43, keys: [59, 62, 65, 67], mel: [[0, 79, 1.5], [2, 77, 0.5], [2.5, 74, 0.5], [3, 71, 1]], stab: true },                                         // G7
+        { root: 40, keys: [62, 64, 67, 71], mel: [[0, 76, 0.5], [0.5, 79, 0.5], [1, 83, 0.75], [2, 81, 0.5], [2.5, 79, 0.5], [3, 76, 1]] },                      // Em7
+        { root: 33, keys: [61, 64, 67, 69], mel: [[0, 81, 0.5], [0.5, 79, 0.5], [1, 76, 0.5], [1.5, 73, 0.5], [2, 76, 1.5], [3.5, 79, 0.5]] },                   // A7
+        { root: 38, root2: 43, keys: [62, 65, 69, 72], keys2: [59, 62, 65, 67], mel: [[0, 77, 0.5], [0.5, 74, 0.5], [1, 77, 0.5], [1.5, 81, 0.5], [2, 79, 0.5], [2.5, 77, 0.5], [3, 74, 0.5], [3.5, 71, 0.5]] },  // Dm7 G7
+        { root: 36, keys: [64, 67, 71, 74], mel: [[0, 72, 1], [1.5, 76, 0.5], [2, 79, 0.5], [2.5, 84, 1.5]], stab: true }                                         // Cmaj7
+    ];
+    function menuBeat(t, spb, bar, beat) {
+        if (beat !== 0) return;                       // se programa el compás entero de una vez
+        const sw = b => { const f = b % 1; return t + (Math.floor(b) + (Math.abs(f - 0.5) < 1e-6 ? 0.58 : f)) * spb; };
+        const ch = MENU[bar % 8];
+        const sec = Math.floor(bar / 8);              // 0: intro sin melodía · luego A y B (melodía una octava arriba)
+        const intro = bar < 2;
+        if (echoDelay) echoDelay.delayTime.setValueAtTime(spb * 0.5, t);
+        // batería: bombo en 1, "y" del 2 y 3; caja en 2 y 4; charles con swing
+        if (!intro || bar === 1) {
+            [0, 1.5, 2].forEach(b => kick(sw(b), 0.24, musicDry));
+            [1, 3].forEach(b => snare(sw(b), 0.055, musicDry));
+            for (let b = 0; b < 4; b += 0.5) hat(sw(b), b % 1 ? 0.01 : 0.016, b === 3.5 && bar % 2 === 1);
+        } else for (let b = 0; b < 4; b += 0.5) hat(sw(b), 0.01);
+        // bajo funky con golpes de octava y nota de paso hacia el siguiente acorde
+        const next = MENU[(bar + 1) % 8].root;
+        const r2 = ch.root2 || ch.root;
+        funkBass(sw(0), ch.root, spb * 0.4);
+        funkBass(sw(0.75), ch.root + 12, spb * 0.18, 0.07, true);
+        funkBass(sw(1.5), ch.root + 7, spb * 0.3);
+        funkBass(sw(2), r2, spb * 0.4);
+        funkBass(sw(2.75), r2 + 12, spb * 0.18, 0.07, true);
+        funkBass(sw(3.5), next + (next > r2 ? -1 : 1), spb * 0.3);
+        // piano eléctrico a contratiempo
+        rhodes(sw(0.5), ch.keys, spb * 0.9);
+        rhodes(sw(2.5), ch.keys2 || ch.keys, spb * 0.9);
+        if (bar % 2 === 1) rhodes(sw(3.75), MENU[(bar + 1) % 8].keys, spb * 0.5, 0.022);
+        // metales al final de cada frase
+        if (ch.stab && !intro) { brass(sw(3), ch.keys.map(n => n + 12).slice(1), spb * 0.25); brass(sw(3.5), ch.keys.map(n => n + 12).slice(1), spb * 0.4); }
+        // melodía (en la B, doblada una octava arriba por la caja de música)
+        if (!intro && sec % 3 !== 2) {
+            const twice = sec % 3 === 1;
+            ch.mel.forEach(([b, n, d]) => { whistle(sw(b), n, d * spb * 0.9); if (twice) musicBox(sw(b), midi(n + 12), { vol: 0.03, dur: 0.8 }); });
+        } else if (!intro) {
+            // la tercera vuelta, solo de piano eléctrico (más tranquila) antes de volver a empezar
+            ch.mel.filter((_, i) => i % 2 === 0).forEach(([b, n]) => rhodes(sw(b), [n - 12], spb * 0.8, 0.026));
+        }
+    }
+
     const MOODS = {
         day: { bpm: 84, vol: 0.5, chords: ['Fmaj7', 'Dm7', 'Bbmaj7', 'Csus'], arp: 8, shaker: true, bass: true, melody: MEL_DAY, melodyEvery: 2, padVol: 0.026 },
         sunset: { bpm: 72, vol: 0.5, chords: ['Bbmaj7', 'FA', 'Gm7', 'Csus'], arp: 4, bass: true, melody: MEL_DAY, melodyEvery: 3, padVol: 0.034 },
@@ -532,6 +649,7 @@
         wedding: { bpm: 64, vol: 0.5, beat: weddingBeat },
         space: { bpm: 58, vol: 0.55, chords: ['Fmaj7', 'Dm7', 'Bbmaj7', 'Csus'], sparse: true, sparkle: true, padVol: 0.04 },
         waltz: { bpm: 84, vol: 0.75, beat: waltzBeat },
+        menu: { bpm: 132, vol: 0.55, beat: menuBeat },
         celebrate: { bpm: 112, vol: 0.55, chords: ['F', 'CE', 'Dm', 'Bb', 'F', 'C', 'Bb', 'C'], arp: 16, shaker: true, bass: true, sparkle: true, padVol: 0.022 }
     };
 
@@ -602,10 +720,10 @@
         if (!ac()) return;
         if (name === moodName) return;
         const t = ctx.currentTime;
-        musicBus.gain.cancelScheduledValues(t);
-        musicBus.gain.setValueAtTime(musicBus.gain.value, t);
+        const G = [musicBus.gain, musicDry.gain];
+        G.forEach(g => { g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); });
         if (!name) {
-            musicBus.gain.linearRampToValueAtTime(0, t + 1.5);
+            G.forEach(g => g.linearRampToValueAtTime(0, t + 1.5));
             moodName = null;
             setTimeout(() => { if (!moodName) mood = null; }, 1600);
             return;
@@ -616,12 +734,14 @@
             mood = MOODS[name];
             bar = 0; beat = 0; cycle = 0;
             nextTime = ctx.currentTime + 0.1;
-            musicBus.gain.cancelScheduledValues(ctx.currentTime);
-            musicBus.gain.setValueAtTime(was ? 0 : musicBus.gain.value, ctx.currentTime);
-            musicBus.gain.linearRampToValueAtTime(mood.vol, ctx.currentTime + 1.2);
+            G.forEach(g => {
+                g.cancelScheduledValues(ctx.currentTime);
+                g.setValueAtTime(was ? 0 : g.value, ctx.currentTime);
+                g.linearRampToValueAtTime(mood.vol, ctx.currentTime + 1.2);
+            });
         };
         if (was) {
-            musicBus.gain.linearRampToValueAtTime(0, t + 0.9);
+            G.forEach(g => g.linearRampToValueAtTime(0, t + 0.9));
             setTimeout(() => { if (moodName === name) switchIt(); }, 950);
         } else switchIt();
         if (!timer) timer = setInterval(tick, 50);
@@ -858,6 +978,55 @@
             [72, 77, 81, 84, 89, 93, 96, 101].forEach((n, i) => bell(t + 2.2 + i * 0.1, midi(n), { vol: 0.035, dur: 2.2, bright: 0.5 }));
         },
         // Claxon del Tesla (suave)
+        // --- Objetos del modo conducción -------------------------------------------
+        itemBox() {
+            if (!ac()) return;
+            const t = ctx.currentTime + 0.01;
+            [72, 76, 79, 84].forEach((n, i) => bell(t + i * 0.035, midi(n), { vol: 0.06, dur: 0.5, bright: 0.8 }));
+            noise(t, 0.15, { vol: 0.05, type: 'highpass', f0: 3000, f1: 9000 });
+        },
+        roulette() { if (!ac()) return; const t = ctx.currentTime; bell(t, midi(84 + Math.floor(Math.random() * 6)), { vol: 0.025, dur: 0.12 }); },
+        itemGet() {
+            if (!ac()) return;
+            const t = ctx.currentTime + 0.01;
+            [79, 84, 88, 91].forEach((n, i) => bell(t + i * 0.06, midi(n), { vol: 0.07, dur: 0.7, bright: 0.6 }));
+        },
+        throwItem() {
+            if (!ac()) return;
+            const t = ctx.currentTime;
+            noise(t, 0.3, { vol: 0.12, type: 'bandpass', f0: 600, f1: 3000, q: 1.2, attack: 0.01 });
+            const o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.setValueAtTime(300, t); o.frequency.exponentialRampToValueAtTime(900, t + 0.18);
+            const g = ctx.createGain(); env(g, t, 0.06, 0.01, 0.22); o.connect(g).connect(sfxBus); o.start(t); o.stop(t + 0.25);
+        },
+        drop() {
+            if (!ac()) return;
+            const t = ctx.currentTime;
+            const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(520, t); o.frequency.exponentialRampToValueAtTime(180, t + 0.15);
+            const g = ctx.createGain(); env(g, t, 0.12, 0.005, 0.2); o.connect(g).connect(sfxBus); o.start(t); o.stop(t + 0.22);
+        },
+        spinOut() {
+            if (!ac()) return;
+            const t = ctx.currentTime;
+            const o = ctx.createOscillator(); o.type = 'sawtooth';
+            o.frequency.setValueAtTime(700, t); o.frequency.exponentialRampToValueAtTime(140, t + 0.7);
+            const lfo = ctx.createOscillator(); lfo.frequency.value = 14; const lg = ctx.createGain(); lg.gain.value = 60; lfo.connect(lg).connect(o.frequency);
+            const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1800;
+            const g = ctx.createGain(); env(g, t, 0.06, 0.01, 0.75);
+            o.connect(f).connect(g).connect(sfxBus); o.start(t); o.stop(t + 0.8); lfo.start(t); lfo.stop(t + 0.8);
+            noise(t, 0.5, { vol: 0.08, type: 'bandpass', f0: 1200, q: 0.6 });
+        },
+        zap() {
+            if (!ac()) return;
+            const t = ctx.currentTime;
+            noise(t, 0.6, { vol: 0.3, type: 'highpass', f0: 1200, attack: 0.002 });
+            const o = ctx.createOscillator(); o.type = 'square'; o.frequency.setValueAtTime(1800, t); o.frequency.exponentialRampToValueAtTime(60, t + 0.5);
+            const g = ctx.createGain(); env(g, t, 0.08, 0.002, 0.55); o.connect(g).connect(sfxBus); o.start(t); o.stop(t + 0.6);
+        },
+        starPower() {
+            if (!ac()) return;
+            const t = ctx.currentTime + 0.01;
+            [72, 76, 79, 84, 79, 84, 88, 91].forEach((n, i) => bell(t + i * 0.08, midi(n), { vol: 0.05, dur: 0.5, bright: 0.9 }));
+        },
         honk() {
             if (!ac()) return;
             const t = ctx.currentTime;

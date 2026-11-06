@@ -121,6 +121,7 @@ birds by day, crickets at night, and the electric hum of the car following its s
 | `session.js` | Time trial, race against the AI and two-player versus (`GAP` and `POINTS` set the Micro Machines rule) |
 | `gymkhana.js` | The five gymkhana tests, their star thresholds and the floor markings |
 | `exam-mode.js` | The original exam (`game/exam.js`) driven with the tuned car |
+| `items.js` | Kart-style items: the `?` boxes (`def.itemRows` sets their rows as fractions of the lap), the odds per position (`TABLE`), each item's effect and how the AI uses them |
 | `ai.js`, `ghost.js`, `camera.js`, `hud.js`, `input.js` | Rivals, the time-trial ghost, the chase camera, the HUD and the gamepad and keyboard input |
 
 To add a circuit, copy one of the map files and change it:
@@ -137,4 +138,5 @@ To add a circuit, copy one of the map files and change it:
 - **Falling off:** `C.voidFn = (x, z) => …` decides where cars fall off the map.
 - **Finish:** call `C.finalize()` at the end.
 
-Records are kept in the browser's `localStorage` (`drive.ghost.v1.*`, `drive.gym.v1`, `drive.car.v1`).
+The menu music is the `menu` mood in `sfx.js` (`menuBeat`), and the item sounds are `sfx.itemBox()`, `sfx.spinOut()`, `sfx.zap()` and so on.
+Records are kept in the browser's `localStorage` (`drive.ghost.v1.*`, `drive.gym.v1`, `drive.car.v1`, `drive.items`).

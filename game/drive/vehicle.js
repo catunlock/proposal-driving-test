@@ -118,7 +118,16 @@ export class Vehicle {
         this.surface = null;
         this.drifting = 0;
         this.lastHit = 0;
+        // objetos (game/drive/items.js)
+        this.spinT = 0; this.slipT = 0; this.starT = 0; this.shrinkT = 0;
         this.syncVisual();
+    }
+    // Trompo (plátano, pelota, cohete, choque con una estrella). Con estrella no pasa nada.
+    spinOut(dur = 1) {
+        if (this.starT > 0 || this.spinT > 0 || this.ghost) return false;
+        this.spinT = dur; this.spinDir = Math.random() < 0.5 ? -1 : 1; this.boostT = 0;
+        if (this.onSpin) this.onSpin();
+        return true;
     }
     get speed() { return Math.hypot(this.vx, this.vz); }
     get kmh() { return Math.abs(this.vf) * KMH; }
@@ -132,17 +141,29 @@ export class Vehicle {
         const S = this.surface = W.surface(this.x, this.z, this);
         const onGround = !this.air;
         const boosting = this.boostT > 0;
+        // objetos: estrella (más rápido, no frena fuera de la pista), rayo (pequeño y lento), aceite (sin agarre)
+        const star = this.starT > 0, small = this.shrinkT > 0, spinning = this.spinT > 0;
+        if (star) this.starT -= dt;
+        if (small) this.shrinkT -= dt;
+        if (this.slipT > 0) this.slipT -= dt;
+        const fxV = (star ? 1.18 : 1) * (small ? 0.62 : 1), fxA = (star ? 1.3 : 1) * (small ? 0.7 : 1);
         if (inp.turbo && this.turbo > 0.02 && onGround && !boosting && vf > -0.5) { this.boostT = 0.25; }
         if (inp.turbo && boosting && this.turbo > 0) { this.turbo = Math.max(0, this.turbo - dt * 0.55); this.boostT = Math.max(this.boostT, 0.12); }
         else if (!boosting) this.turbo = Math.min(1, this.turbo + dt * 0.07);
         if (boosting) this.boostT -= dt;
         const boost = boosting ? 1.55 : 1;
-        const maxV = P.maxV * S.cap * (boosting ? 1.3 : 1);
+        const maxV = P.maxV * (star ? Math.max(1, S.cap) : S.cap) * (boosting ? 1.3 : 1) * fxV;
         let acc = 0;
-        if (onGround) {
+        if (onGround && spinning) {
+            // trompo: gira sin control y se va frenando
+            this.spinT -= dt;
+            const k = Math.max(0, 1 - dt * 2.4); vf *= k; vr *= k;
+            this.w = this.spinDir * 12 * Math.min(1, 0.35 + this.spinT * 1.5);
+            this.steer *= 0.8; this.drifting = 1;
+        } else if (onGround) {
             // Motor y frenos (mismo esquema que el examen: frenar del todo y luego marcha atrás)
             if (vf >= -0.05) {
-                if (inp.thr > 0.03) acc += inp.thr * P.accel * boost * S.grip ** 0.5 * (1 - Math.max(0, vf) / maxV * 0.7);
+                if (inp.thr > 0.03) acc += inp.thr * P.accel * fxA * boost * (star ? 1 : S.grip ** 0.5) * (1 - Math.max(0, vf) / maxV * 0.7);
                 if (inp.brk > 0.03) {
                     if (vf > 0.25) acc -= inp.brk * P.brake;
                     else { this.revT += dt; if (this.revT > 0.25) acc -= inp.brk * P.accel * 0.6; else vf = Math.min(vf, 0); }
@@ -161,7 +182,7 @@ export class Vehicle {
             vf = Math.max(nvf, -P.maxV * 0.32);
             // Agarre lateral: cuánto "de lado" se puede corregir por segundo
             const hb = inp.hb ? 1 : 0;
-            const latMax = 30 * P.grip * S.grip * (hb ? 0.22 : 1);
+            const latMax = 30 * P.grip * (star ? Math.max(1, S.grip) : S.grip) * (hb ? 0.22 : 1) * (this.slipT > 0 ? 0.15 : 1);
             const dvr = THREE.MathUtils.clamp(-vr, -latMax * dt, latMax * dt);
             vr += dvr;
             this.drifting = Math.abs(vr) > 1.6 ? Math.min(1, Math.abs(vr) / 5) : 0;
@@ -254,6 +275,8 @@ export class Vehicle {
                 nx += ux * pen * k1; nz += uz * pen * k1;
                 o.x -= ux * pen * k2; o.z -= uz * pen * k2;
                 const rv = (this.vx - o.vx) * ux + (this.vz - o.vz) * uz;
+                if (this.starT > 0 && !(o.starT > 0)) o.spinOut(0.9);
+                else if (o.starT > 0 && !(this.starT > 0)) this.spinOut(0.9);
                 if (rv < 0) {
                     const j = -(1.3) * rv / (1 / m1 + 1 / m2);
                     this.vx += j / m1 * ux; this.vz += j / m1 * uz;
@@ -299,6 +322,21 @@ export class Vehicle {
         const sh = Math.max(0.35, 1 - (this.y - this.ground) * 0.12);
         this.blob.scale.set(M.dims.wid * 0.6 * sh, M.dims.len * 0.56 * sh, 1);
         this.blob.visible = this.ground > -20;
+        // rayo: el coche encoge; estrella: aura arcoíris
+        const tk = this.shrinkT > 0 ? 0.55 : 1;
+        this._scale = (this._scale ?? 1) + (tk - (this._scale ?? 1)) * Math.min(1, dt * 6);
+        M.group.scale.setScalar(this._scale);
+        if (this.starT > 0) {
+            if (!this.aura) {
+                this.aura = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.4, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+                this.aura.scale.set(M.dims.wid * 0.85, (M.dims.height || 1.2) * 0.75, M.dims.len * 0.68);
+                this.aura.position.y = (M.dims.height || 1.2) * 0.45;
+                this.tilt.add(this.aura);
+            }
+            this.aura.visible = true;
+            this.aura.material.color.setHSL((performance.now() * 0.0012) % 1, 1, 0.55);
+            this.aura.material.opacity = this.starT < 1.2 ? 0.4 * (Math.sin(performance.now() * 0.03) > 0 ? 1 : 0.2) : 0.4;
+        } else if (this.aura) this.aura.visible = false;
         const boosting = this.boostT > 0;
         for (const f of this.flames) {
             f.visible = boosting;

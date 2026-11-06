@@ -14,6 +14,7 @@ import { ChaseCam } from './camera.js';
 import { AIDriver } from './ai.js';
 import { Recorder, loadGhost, saveGhost, playGhost } from './ghost.js';
 import { fmt } from './hud.js';
+import { Items } from './items.js';
 
 const sfx = (n, ...a) => { if (window.sfx && window.sfx[n]) window.sfx[n](...a); };
 export const GAP = 40, POINTS = 5;
@@ -88,6 +89,8 @@ export class RaceSession {
             this.cams.push(cc);
         });
         if (pl.length > 1) this._split(true);
+        // objetos (carrera y pique a dos)
+        if (this.opts.items && this.mode !== 'time') this.items = new Items(this);
         this.C.follow(pl[0].root.position);
         this.state = 'ready';
     }
@@ -127,7 +130,7 @@ export class RaceSession {
         return new Promise(resolve => {
             this.resolve = resolve;
             const nP = this.cars.filter(v => v.isPlayer).length;
-            hud.setup(nP, { lap: this.mode !== 'versus', pos: this.mode === 'race', best: this.mode !== 'versus', points: this.mode === 'versus', title: this.opts.map.name });
+            hud.setup(nP, { lap: this.mode !== 'versus', pos: this.mode === 'race', best: this.mode !== 'versus', points: this.mode === 'versus', title: this.opts.map.name, items: !!this.items });
             hud.miniSetup(this.C);
             this._helpText();
             this.cars.filter(v => v.isPlayer).forEach((v, i) => {
@@ -147,9 +150,11 @@ export class RaceSession {
     _helpText() {
         const pad = this.app.controls.pads().length > 0;
         const H = this.app.hud;
-        if (this.mode === 'versus') H.setHelp('J1: <b>W A S D</b> · <b>Espacio</b> freno de mano · <b>Mayús izq.</b> turbo &nbsp;|&nbsp; J2: <b>flechas</b> · <b>Ctrl dcho.</b> freno · <b>Mayús dcha.</b> turbo &nbsp;·&nbsp; 🎮 cada uno su mando');
-        else H.setHelp(pad ? '🎮 <b>RT</b> acelerar · <b>LT</b> frenar / atrás · <b>B</b> freno de mano · <b>A</b> turbo · <b>Y</b> volver a la pista · <b>Start</b> pausa'
-            : '⌨️ <b>W A S D</b> / flechas · <b>Espacio</b> freno de mano · <b>Mayús</b> turbo · <b>R</b> volver a la pista · <b>Esc</b> pausa');
+        const it = !!this.items;
+        H.itemHint = pad ? 'X' : this.mode === 'versus' ? '' : 'E';
+        if (this.mode === 'versus') H.setHelp(`J1: <b>W A S D</b> · <b>Espacio</b> freno de mano · <b>Mayús izq.</b> turbo${it ? ' · <b>E</b> objeto' : ''} &nbsp;|&nbsp; J2: <b>flechas</b> · <b>Ctrl dcho.</b> freno · <b>Mayús dcha.</b> turbo${it ? ' · <b>.</b> objeto' : ''} &nbsp;·&nbsp; 🎮 cada uno su mando${it ? ' (<b>X</b> objeto)' : ''}`);
+        else H.setHelp(pad ? `🎮 <b>RT</b> acelerar · <b>LT</b> frenar / atrás · <b>B</b> freno de mano · <b>A</b> turbo${it ? ' · <b>X</b> objeto (frenando, hacia atrás)' : ''} · <b>Y</b> volver a la pista · <b>Start</b> pausa`
+            : `⌨️ <b>W A S D</b> / flechas · <b>Espacio</b> freno de mano · <b>Mayús</b> turbo${it ? ' · <b>E</b> objeto (con <b>S</b>, hacia atrás)' : ''} · <b>R</b> volver a la pista · <b>Esc</b> pausa`);
     }
 
     update(dt, t) {
@@ -168,6 +173,7 @@ export class RaceSession {
                 if (inp.pressed.pause && this.onPause) { this.onPause(); controls.endFrame(); return; }
                 if (inp.pressed.horn) sfx('honk');
                 if (inp.pressed.reset && running) this._respawn(v, '↩️ ¡De vuelta a la pista!');
+                if (inp.pressed.item && running && this.items) this.items.use(v, inp.brk > 0.5);
             } else {
                 const lead = v.lap.total - this.cars[0].lap.total;
                 inp = v.ai.control(dt, lead);
@@ -205,6 +211,7 @@ export class RaceSession {
         this.C.follow(this.cams[0].v.root.position);
         this.C.update(dt, t, camInfo);
         this.FX.update(dt);
+        if (this.items) this.items.update(dt, running, this.time);
         const players = this.cars.filter(v => v.isPlayer);
         players.forEach((v, i) => {
             hud.dash(i, v);
@@ -217,6 +224,16 @@ export class RaceSession {
         hud.miniDraw(live);
         if (window.sfx) sfx('engine', Math.min(1, Math.abs(players[0].vf) / 20));
         controls.endFrame();
+    }
+
+    // Puesto relativo (0 = primero … 1 = último) para repartir objetos, y el coche de delante (cohete)
+    rank(v) {
+        const order = this._order();
+        return order.length > 1 ? order.indexOf(v) / (order.length - 1) : 0;
+    }
+    ahead(v) {
+        const order = this._order(), i = order.indexOf(v);
+        return i > 0 ? order[i - 1] : null;
     }
 
     _order() {
@@ -329,6 +346,7 @@ export class RaceSession {
         this._split(false);
         for (const v of this.cars) engine.scene.remove(v.root);
         if (this.ghost) engine.scene.remove(this.ghost.root);
+        this.items && this.items.dispose();
         this.FX && this.FX.dispose();
         this.C && this.C.dispose();
         hud.hide();

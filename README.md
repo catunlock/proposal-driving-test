@@ -43,6 +43,7 @@ toy cars racing over giant everyday things.
 |---|---|
 | ![Garage with live tuning](docs/screenshots/drive-garage.webp) | ![Race on the breakfast table](docs/screenshots/drive-race.webp) |
 | ![Split-screen versus on the desk](docs/screenshots/drive-versus.webp) | ![Low-gravity Mars](docs/screenshots/drive-marte.webp) |
+| ![Item boxes and a banana on the breakfast table](docs/screenshots/drive-items.webp) | ![Gymkhana slalom](docs/screenshots/drive-gym.webp) |
 
 - **Garage.**
   - Eight cars: the Model 3 plus seven Kenney vehicles.
@@ -57,6 +58,15 @@ toy cars racing over giant everyday things.
   - **Desk:** a pencil-drawn track around a laptop, with ink spills and pencils as guard rails.
   - **Garden:** a dirt path, puddles and mud, a garden-hose barrier, and a snail that will not yield.
   - **Mars:** 38 % gravity, so every crater rim becomes a long jump.
+- **Kart-style items in races and versus.**
+  - Breaking a `?` box spins an item roulette. The odds depend on your position, so the leader gets traps and
+    the last car gets the strong items.
+  - The items: 🍄 boost, 🍌 banana and 🛢️ oil slick (dropped behind), 🎾 a bouncing ball that ricochets off walls,
+    🚀 a homing rocket that chases the car ahead, ⭐ a star (invincible and faster) and ⚡ lightning, which shrinks
+    and slows everybody else.
+  - The AI uses items too: it drops traps when someone is right behind and fires when it has a clear shot.
+- **Menu music:** a swung jazz-funk loop in the spirit of kart-racer menus (electric piano, slap bass, brass
+  stabs, whistle lead), synthesized live like the rest of the soundtrack.
 - **Modes.**
   - **Time trial:** a ghost of your best lap is stored in the browser.
   - **Race:** three AI rivals.
@@ -134,10 +144,10 @@ Exam controls: on a gamepad, **RT** accelerates, **LT** brakes or reverses, the 
 **LB/RB** work the indicators and **A** confirms. On a keyboard: arrow keys or **WASD**, **Q/E** for the
 indicators and **Enter** to confirm.
 
-Driving-mode controls: **RT/LT** accelerate and brake, **B** handbrake, **A** boost, **Y** back to the track and
-**Start** pause. On a keyboard: **WASD** or the arrow keys, **Space** handbrake, **Shift** boost, **R** back to the
-track and **Esc** pause. In two-player mode each player has their own gamepad, or their own half of the keyboard
-(WASD for player 1, the arrow keys for player 2).
+Driving-mode controls: **RT/LT** accelerate and brake, **B** handbrake, **A** boost, **X** or **LB** use item
+(hold the brake to throw it backwards), **Y** back to the track and **Start** pause. On a keyboard: **WASD** or the
+arrow keys, **Space** handbrake, **Shift** boost, **E** item, **R** back to the track and **Esc** pause. In two-player mode each player has their own gamepad, or their own half of the keyboard
+(WASD and **E** for player 1, the arrow keys and **.** for player 2).
 
 ## Deploy
 
